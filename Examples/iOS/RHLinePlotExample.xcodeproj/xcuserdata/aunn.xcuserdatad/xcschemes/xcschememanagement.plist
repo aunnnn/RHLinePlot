@@ -4,25 +4,15 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>RHLinePlot.xcscheme_^#shared#^_</key>
+		<key>RHLinePlotExample.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>0</integer>
-		</dict>
-		<key>RHLinePlotStatic.xcscheme_^#shared#^_</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>2</integer>
+			<integer>1</integer>
 		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>30C49EAF243F0E1A005D2B54</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>30C49EB8243F0E1A005D2B54</key>
+		<key>30CACE13243F22A000C8669F</key>
 		<dict>
 			<key>primary</key>
 			<true/>
