@@ -22,7 +22,9 @@ struct CustomizationPage: View {
     @State var glowingDuration: Double = 0.8
     @State var glowingDelayBetweenGlows: Double = 0.5
     @State var segmentAnimationDuration: Double = 0.1
-    @State var isLaserModeOn = false
+    var isLaserModeOn = false
+    
+    @State var useCustomIndicator = false
     
     func refreshPlot() {
         print("Refresh plot...")
@@ -54,81 +56,102 @@ struct CustomizationPage: View {
             c.useLaserLightLinePlotStyle = self.isLaserModeOn
         }
         
-        return Form {
+        return List {
             Section {
-                Toggle(isOn: $isLaserModeOn) {
-                    Text("Laser Mode")
-                }
-                
-                VStack {
-                    RHInteractiveLinePlot(
-                        values: values,
-                        occupyingRelativeWidth: relativeWidth,
-                        showGlowingIndicator: showGlowingIndicator,
-                        lineSegmentStartingIndices: segments,
-                        didSelectValueAtIndex: { value in
-                            print("Select \(String(describing: value))")
-                    },
-                        valueStickLabel: { value in
-                            Text("\(String(format: "%.2f", value))")
-                                .padding(2)
-                    })
-                        .environment(\.rhLinePlotConfig, config)
-                        .foregroundColor(.green)
-                        .border(Color.black)
-                        .frame(maxWidth: .infinity, minHeight: 200)
-                }
-                
-                Group {
-                    HStack {
-                        Text("Relative width \(String(format: "%.2f", relativeWidth))")
-                        Slider(value: $relativeWidth, in: (0...1))
-                    }
-                    
-                    Toggle(isOn: $showGlowingIndicator) {
-                        Text("Show glowing indicator")
-                    }
-                    
-                    Text("Appearance below is configured via RHLinePlotConfig environment.")
-                        .font(.callout)
-                        .foregroundColor(.green)
-                    
-                    HStack {
-                        Text("Line width \(String(format: "%.2f", lineWidth))")
-                        Slider(value: $lineWidth, in: (1...4))
-                    }
-                    HStack {
-                        Text("Segment animation duration \(String(format: "%.2f", segmentAnimationDuration))")
-                        Slider(value: $segmentAnimationDuration, in: (0.01...0.6))
-                    }
-                    HStack {
-                        Text("Indicator width \(String(format: "%.2f", indicatorWidth))")
-                        Slider(value: $indicatorWidth, in: (4...20))
-                    }
-                    
-                    Group {
-                        Text("For config below, we automatically toggle \"Show glowing indicator\" to refresh the plot:")
-                            .font(.callout)
-                            .foregroundColor(.orange)
-                        
-                        HStack {
-                            Text("Glowing scale effect \(String(format: "%.2f", glowingIndicatorScaleEffect))")
-                            Slider(value: withRefresh($glowingIndicatorScaleEffect), in: (1...15))
-                        }
-                        
-                        HStack {
-                            Text("Glowing duration \(String(format: "%.2f", glowingDuration))")
-                            Slider(value: withRefresh($glowingDuration), in: (0.1...2))
-                        }
-                        
-                        HStack {
-                            Text("Delay between glows \(String(format: "%.2f", glowingDelayBetweenGlows))")
-                            Slider(value: withRefresh($glowingDelayBetweenGlows), in: (0.01...1))
-                        }
-                    }
+                Toggle(isOn: $useCustomIndicator) {
+                    Text("Use custom indicator")
                 }
             }
-        }.navigationBarTitle("Customization")
+            
+            Section {
+                RHInteractiveLinePlot(
+                    values: values,
+                    occupyingRelativeWidth: relativeWidth,
+                    showGlowingIndicator: showGlowingIndicator,
+                    lineSegmentStartingIndices: segments,
+                    didSelectValueAtIndex: { value in
+                        print("Select \(String(describing: value))")
+                },
+                    customLatestValueIndicator: {
+                        if self.useCustomIndicator {
+                            AnyView(
+                                Text("CUSTOM")
+                                    .font(.callout)
+                                    .frame(width: 100, height: 40)
+                            )
+                        } else {
+                            AnyView(GlowingIndicator())
+                        }
+                },
+                    valueStickLabel: { value in
+                        Text("\(String(format: "%.2f", value))")
+                            .padding(2)
+                })
+                    .environment(\.rhLinePlotConfig, config)
+                    .foregroundColor(.green)
+                    .border(Color.black)
+                    .frame(maxWidth: .infinity, minHeight: 200)
+            }
+            
+            Section(header:
+                Text("Configure via initializer:")
+                    .font(.callout)
+            ) {
+                
+                HStack {
+                    Text("Relative width \(String(format: "%.2f", relativeWidth))")
+                    Slider(value: $relativeWidth, in: (0...1))
+                }
+                
+                Toggle(isOn: $showGlowingIndicator) {
+                    Text("Show glowing indicator")
+                }
+                
+            }
+            
+            Section(header:
+                Text("Configure via RHLinePlotConfig environment.")
+                    .font(.callout)
+                    .foregroundColor(.green)
+            ) {
+                HStack {
+                    Text("Line width \(String(format: "%.2f", lineWidth))")
+                    Slider(value: $lineWidth, in: (1...4))
+                }
+                HStack {
+                    Text("Segment animation duration \(String(format: "%.2f", segmentAnimationDuration))")
+                    Slider(value: $segmentAnimationDuration, in: (0.01...0.6))
+                }
+                HStack {
+                    Text("Indicator width \(String(format: "%.2f", indicatorWidth))")
+                    Slider(value: $indicatorWidth, in: (4...20))
+                }
+            }
+            
+            Section(header:
+                Text("For animation-related config below, we will toggle \"Show glowing indicator\" to reload the plot:")
+                    .font(.callout)
+                    .foregroundColor(.orange)
+            ) {
+                
+                HStack {
+                    Text("Glowing scale effect \(String(format: "%.2f", glowingIndicatorScaleEffect))")
+                    Slider(value: withRefresh($glowingIndicatorScaleEffect), in: (1...15))
+                }
+                
+                HStack {
+                    Text("Glowing duration \(String(format: "%.2f", glowingDuration))")
+                    Slider(value: withRefresh($glowingDuration), in: (0.1...2))
+                }
+                
+                HStack {
+                    Text("Delay between glows \(String(format: "%.2f", glowingDelayBetweenGlows))")
+                    Slider(value: withRefresh($glowingDelayBetweenGlows), in: (0.01...1))
+                }
+            }
+        }
+        .listStyle(GroupedListStyle())
+        .navigationBarTitle("Customization")
     }
 }
 

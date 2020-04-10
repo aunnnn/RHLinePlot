@@ -8,11 +8,13 @@
 
 import SwiftUI
 
-/// Indicator with glowing effect. Used to show latest value in a line plot.
+/// Default indicator with glowing effect. Used to show latest value in a line plot.
 public struct GlowingIndicator: View {
     
     @State var isGlowing: Bool = false
     @Environment(\.rhLinePlotConfig) var rhLinePlotConfig
+    
+    public init() {}
     
     private var glowingAnimation: Animation {
         Animation

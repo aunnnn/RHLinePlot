@@ -14,16 +14,14 @@ struct BasicUsagePage: View {
     let values: [CGFloat] = (0...numValues).map { _ in CGFloat.random(in: (0...100)) }
     let segments = Array(stride(from: 0, to: numValues, by: 5))
     
-    @State var isLaserModeOn = false
-    
     func valueStickLabel(value: CGFloat) -> some View {
         Text("\(String(format: "%.2f", value))")
     }
+    
+    var isLaserModeOn = false
+    
     var body: some View {
         List {
-            Toggle(isOn: $isLaserModeOn) {
-                Text("Laser Mode")
-            }
             
             VStack {
                 Text("Unsegmented")
@@ -98,7 +96,7 @@ struct BasicUsagePage: View {
         .font(.headline)
         .navigationBarTitle("Basic Usage")
         .environment(\.rhLinePlotConfig, RHLinePlotConfig.default.custom(f: { (c) in
-            c.useLaserLightLinePlotStyle = self.isLaserModeOn
+            c.useLaserLightLinePlotStyle = isLaserModeOn
         }))
     }
 }

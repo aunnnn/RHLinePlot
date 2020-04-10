@@ -11,14 +11,15 @@ import SwiftUI
 struct HomeView: View {
     
     var basicUsagePage: some View {
-        BasicUsagePage()
+        BasicUsagePage(isLaserModeOn: isLaserModeOn)
     }
     
     var customizationPage: some View {
-        CustomizationPage()
+        CustomizationPage(isLaserModeOn: isLaserModeOn)
     }
     
     @State var isDarkMode: Bool = false
+    @State var isLaserModeOn: Bool = false
     
     var body: some View {
         NavigationView {
@@ -41,6 +42,10 @@ struct HomeView: View {
                         } else {
                             Text("Use Dark Mode")
                         }
+                    }
+                    
+                    Toggle(isOn: $isLaserModeOn) {
+                        Text("Laser Mode (Best in dark)")
                     }
                 }
             }

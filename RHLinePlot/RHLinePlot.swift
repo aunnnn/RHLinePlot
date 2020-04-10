@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-public struct RHLinePlot: View {
+public struct RHLinePlot<Indicator: View>: View {
     
     /// TODO: Can I use generic? Already tried but got problems
     /// (i.e. CGFloat/CGPoint conversion) along the road.
@@ -40,17 +40,17 @@ public struct RHLinePlot: View {
     /// Note: You should provide a fixed-size* frame to contain the content of your custom indicator before returning. Otherwise the size shown could be wrong.
     ///
     /// Note 2: We can't keep the generic version  since we don't want to pollute the initializer with generic, when the default glowing indicator is used.
-    let customLatestValueIndicator: () -> AnyView
+    let customLatestValueIndicator: () -> Indicator
     
     /// Plot Config
     @Environment(\.rhLinePlotConfig) var rhLinePlotConfig
     
-    public init<Indicator: View>(values: [Value],
-                                 occupyingRelativeWidth: CGFloat = 1,
-                                 showGlowingIndicator: Bool = false,
-                                 lineSegmentStartingIndices: [Int]? = nil,
-                                 activeSegment: Int? = nil,
-                                 @ViewBuilder customLatestValueIndicator: @escaping () -> Indicator
+    public init(values: [Value],
+                occupyingRelativeWidth: CGFloat = 1,
+                showGlowingIndicator: Bool = false,
+                lineSegmentStartingIndices: [Int]? = nil,
+                activeSegment: Int? = nil,
+                @ViewBuilder customLatestValueIndicator: @escaping () -> Indicator
     ) {
         #if DEBUG
         if let segments = lineSegmentStartingIndices {
@@ -69,7 +69,7 @@ public struct RHLinePlot: View {
         self.lineSegmentStartingIndices = lineSegmentStartingIndices
         self.activeSegment = activeSegment
         self.customLatestValueIndicator = {
-            return AnyView(customLatestValueIndicator())
+            return customLatestValueIndicator()
         }
     }
     
@@ -102,7 +102,7 @@ public struct RHLinePlot: View {
 }
 
 // Default glowing indicator
-public extension RHLinePlot {
+public extension RHLinePlot where Indicator == GlowingIndicator {
     init(values: [Value],
          occupyingRelativeWidth: CGFloat = 1,
          showGlowingIndicator: Bool = false,

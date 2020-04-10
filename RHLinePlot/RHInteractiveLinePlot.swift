@@ -8,8 +8,8 @@
 
 import SwiftUI
 
-public struct RHInteractiveLinePlot<StickLabel>: View
-    where StickLabel: View
+public struct RHInteractiveLinePlot<StickLabel, Indicator>: View
+    where StickLabel: View, Indicator: View
 {
     public typealias Value = CGFloat
     
@@ -30,6 +30,8 @@ public struct RHInteractiveLinePlot<StickLabel>: View
     /// Notify when the segment index selected is changed
     let didSelectSegmentAtIndex: ((Int?) -> Void)?
     
+    let customLatestValueIndicator: () -> Indicator
+    
     @GestureState var isDragging: Bool = false
     @State private var draggableIndicatorOffset: CGFloat = 0
     @State private var currentlySelectedIndex: Int? = nil
@@ -43,6 +45,8 @@ public struct RHInteractiveLinePlot<StickLabel>: View
         didSelectValueAtIndex: ((Int?) -> Void)? = nil,
         didSelectSegmentAtIndex: ((Int?) -> Void)? = nil,
         @ViewBuilder
+        customLatestValueIndicator: @escaping () -> Indicator,
+        @ViewBuilder
         valueStickLabel: @escaping (Value) -> StickLabel
     ) {
         self.values = values
@@ -52,6 +56,7 @@ public struct RHInteractiveLinePlot<StickLabel>: View
         self.didSelectSegmentAtIndex = didSelectSegmentAtIndex
         self.valueStickLabelBuilder = valueStickLabel
         self.showGlowingIndicator = showGlowingIndicator
+        self.customLatestValueIndicator = customLatestValueIndicator
     }
     
     public var body: some View {
@@ -66,7 +71,9 @@ public struct RHInteractiveLinePlot<StickLabel>: View
             occupyingRelativeWidth: occupyingRelativeWidth,
             showGlowingIndicator: showGlowingIndicator,
             lineSegmentStartingIndices: lineSegmentStartingIndices,
-            activeSegment: currentlySelectedSegmentIndex)
+            activeSegment: currentlySelectedSegmentIndex,
+            customLatestValueIndicator: customLatestValueIndicator
+        )
     }
     
     var stickAndLabelOpacity: Double {
@@ -124,6 +131,32 @@ public struct RHInteractiveLinePlot<StickLabel>: View
                 .contentShape(Rectangle())
                 .gesture(touchAndDrag(maxWidth: maxGraphWidth))
         }
+    }
+}
+
+// Default indicator
+public extension RHInteractiveLinePlot where Indicator == GlowingIndicator {
+    init(
+        values: [Value],
+        occupyingRelativeWidth: CGFloat = 1.0,
+        showGlowingIndicator: Bool = false,
+        lineSegmentStartingIndices: [Int]? = nil,
+        didSelectValueAtIndex: ((Int?) -> Void)? = nil,
+        didSelectSegmentAtIndex: ((Int?) -> Void)? = nil,
+        @ViewBuilder
+        valueStickLabel: @escaping (Value) -> StickLabel
+    ) {
+        self.init(
+            values: values,
+            occupyingRelativeWidth: occupyingRelativeWidth,
+            showGlowingIndicator: showGlowingIndicator,
+            lineSegmentStartingIndices: lineSegmentStartingIndices,
+            didSelectValueAtIndex: didSelectValueAtIndex,
+            didSelectSegmentAtIndex: didSelectSegmentAtIndex,
+            customLatestValueIndicator: {
+                GlowingIndicator()
+        },
+            valueStickLabel: valueStickLabel)
     }
 }
 
