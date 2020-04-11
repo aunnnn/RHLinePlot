@@ -155,8 +155,8 @@ struct CustomizationPage: View {
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
+struct CustomizationPage_Previews: PreviewProvider {
     static var previews: some View {
-        CustomizationPage()
+        CustomizationPage(isLaserModeOn: false)
     }
 }

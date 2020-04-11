@@ -24,7 +24,8 @@ extension RHLinePlot {
         func drawSegment(path: inout Path, segment: (from: Int, to: Int)) {
             let segmentValues = values[segment.from..<segment.to]
             
-            // The starting point of this segment
+            // The starting point of this segment (previous data point)
+            // Note that when from is 0, this will be -1.
             let previousIndex = segment.from - 1
             
             // Previous Y (if previousIndex is -1, just use 0)
@@ -42,17 +43,27 @@ extension RHLinePlot {
             
             assert(inverseValueHeightDifference != nil)
             var currentY = (1 - inverseValueHeightDifference! * previousYPosition) * HEIGHT
+            
             path.move(to: CGPoint(x: currentX, y: currentY))
+            
+            // Draw segments of (currentX, nextX)
             for v in segmentValues {
-                currentX += lineSectionLength
-                currentY = (1 - inverseValueHeightDifference! * CGFloat(v - lowest)) * HEIGHT
-                path.addLine(to: CGPoint(x: currentX, y: currentY))
+                let nextX = currentX + lineSectionLength
+                let nextY = (1 - inverseValueHeightDifference! * CGFloat(v - lowest)) * HEIGHT
+                if currentX < 0 {
+                    // *Handle when previousIndex is -1,  currentX will be negative. We won't addLine here yet, just move.
+                    path.move(to: CGPoint(x: nextX, y: nextY))
+                } else {
+                    path.addLine(to: CGPoint(x: nextX, y: nextY))
+                }
+                currentX = nextX
+                currentY = nextY
             }
         }
         
         // Build tuples of segments: [(from ,to)], `to` is exclusive.
-        let allSplitPloints = lineSegmentStartingIndices + [values.count]
-        let segments = Array(zip(allSplitPloints, allSplitPloints[1...]).enumerated())
+        let allSplitPoints = lineSegmentStartingIndices + [values.count]
+        let segments = Array(zip(allSplitPoints, allSplitPoints[1...]).enumerated())
         
         func pathForSegment(i: Int, s: (from: Int, to: Int)) -> some View {
             let path = Path { path in

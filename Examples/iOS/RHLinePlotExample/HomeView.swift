@@ -18,6 +18,10 @@ struct HomeView: View {
         CustomizationPage(isLaserModeOn: isLaserModeOn)
     }
     
+    var robinhoodPage: some View {
+        RobinhoodPage(isLaserModeOn: isLaserModeOn)
+    }
+    
     @State var isDarkMode: Bool = false
     @State var isLaserModeOn: Bool = false
     
@@ -30,6 +34,9 @@ struct HomeView: View {
                     }
                     NavigationLink(destination: customizationPage) {
                         Text("Customization")
+                    }
+                    NavigationLink(destination: robinhoodPage) {
+                        Text("Robinhood")
                     }
                 }
                 

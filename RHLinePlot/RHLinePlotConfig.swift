@@ -24,6 +24,7 @@ public extension EnvironmentValues {
 }
 
 public struct RHLinePlotConfig {
+
     /// Width of the rectangle holding the glowing indicator (i.e. not `radius`, but rather `glowingIndicatorWidth = 2*radius`). Default is `8.0`
     public var glowingIndicatorWidth: CGFloat = 8.0
     
@@ -46,6 +47,14 @@ public struct RHLinePlotConfig {
     public var glowingIndicatorGlowAnimationDuration: Double = 0.8
     
     public var useLaserLightLinePlotStyle: Bool = false
+    
+    // MARK:- RHInteractiveLinePlot
+    
+    public var valueStickWidth: CGFloat = 1.2
+    public var valueStickColor: Color = .gray
+    public var valueStickTopPadding: CGFloat = 28
+    public var valueStickBottomPadding: CGFloat = 28
+    public var gapBetweenPlotAndStickLabel: CGFloat = 8
     
     public static let `default` = RHLinePlotConfig()
     

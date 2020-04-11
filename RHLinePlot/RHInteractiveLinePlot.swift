@@ -12,9 +12,13 @@ public struct RHInteractiveLinePlot<StickLabel, Indicator>: View
     where StickLabel: View, Indicator: View
 {
     public typealias Value = CGFloat
-    
-    let valueStickLineWidth: CGFloat = 1
-    let gapBetweenPlotAndStickLabel: CGFloat = 8
+    public enum SegmentSearchStrategy {
+        /// Use binary search to search for active segment in O(log(no. of segments)). No extra space needed.
+        case binarySearch
+        
+        /// Store mapping of value index -> segment index for O(1) lookup. However we keep an extra O(no. of `values`) space.
+        case cacheLookup
+    }
     
     let values: [Value]
     let lineSegmentStartingIndices: [Int]?
@@ -32,16 +36,25 @@ public struct RHInteractiveLinePlot<StickLabel, Indicator>: View
     
     let customLatestValueIndicator: () -> Indicator
     
+    /// Strategy to use to search for an active segment.
+    let segmentSearchStrategy: SegmentSearchStrategy
+    
     @GestureState var isDragging: Bool = false
     @State private var draggableIndicatorOffset: CGFloat = 0
     @State private var currentlySelectedIndex: Int? = nil
     @State private var currentlySelectedSegmentIndex: Int? = nil
+    
+    /// Use when segmentSearchStrategy from `rhPlotConfig` is `cacheLookup`, store mapping of value index -> segment index for O(1) lookup. However we keep twice the `values` data!
+    private var valueIndexToSegmentIndexCache: [Int]?
+    
+    @Environment(\.rhLinePlotConfig) var rhPlotConfig
     
     public init(
         values: [Value],
         occupyingRelativeWidth: CGFloat = 1.0,
         showGlowingIndicator: Bool = false,
         lineSegmentStartingIndices: [Int]? = nil,
+        segmentSearchStrategy: SegmentSearchStrategy = .binarySearch,
         didSelectValueAtIndex: ((Int?) -> Void)? = nil,
         didSelectSegmentAtIndex: ((Int?) -> Void)? = nil,
         @ViewBuilder
@@ -57,6 +70,25 @@ public struct RHInteractiveLinePlot<StickLabel, Indicator>: View
         self.valueStickLabelBuilder = valueStickLabel
         self.showGlowingIndicator = showGlowingIndicator
         self.customLatestValueIndicator = customLatestValueIndicator
+        self.segmentSearchStrategy = segmentSearchStrategy
+        
+        if let segments = lineSegmentStartingIndices, segmentSearchStrategy == .cacheLookup {
+            self.valueIndexToSegmentIndexCache = buildSegmentLookupCache(segments: segments)
+            print("Cache Lookup Mode! \(self.valueIndexToSegmentIndexCache?.count)")
+        }
+    }
+    
+    private func buildSegmentLookupCache(segments: [Int]) -> [Int] {
+//        guard let segments = lineSegmentStartingIndices else { return nil }
+        var cache = Array<Int>(repeating: -1, count: self.values.count)
+        let allSplitPoints = segments + [self.values.count]
+        let segmentLocations = zip(allSplitPoints, allSplitPoints[1...])
+        for (i, sp) in segmentLocations.enumerated() {
+            // Exclusive `to`
+            let (from, to) = sp
+            cache.replaceSubrange((from..<to), with: repeatElement(i, count: to-from))
+        }
+        return cache
     }
     
     public var body: some View {
@@ -106,7 +138,7 @@ public struct RHInteractiveLinePlot<StickLabel, Indicator>: View
             return CGAffineTransform(translationX: translationX, y: 0)
         }
         
-        return VStack(spacing: gapBetweenPlotAndStickLabel) {
+        return VStack(spacing: rhPlotConfig.gapBetweenPlotAndStickLabel) {
             
             // Value Stick Label
             // HACK: We get a dynamic size of value stick label through `overlay`.
@@ -120,12 +152,17 @@ public struct RHInteractiveLinePlot<StickLabel, Indicator>: View
             
             // Line Plot
             linePlot()
-                .padding(.vertical, 16)
+                .padding(EdgeInsets(
+                    top: rhPlotConfig.valueStickTopPadding,
+                    leading: 0,
+                    bottom: rhPlotConfig.valueStickBottomPadding,
+                    trailing: 0))
                 .overlay(
                     // Value Stick
-                    LinePlotValueStick(lineWidth: valueStickLineWidth)
+                    LinePlotValueStick(lineWidth: rhPlotConfig.valueStickWidth)
                         .opacity(stickAndLabelOpacity)
-                        .offset(x: valueStickOffset-(valueStickLineWidth/2)),
+                        .offset(x: valueStickOffset-(rhPlotConfig.valueStickWidth/2))
+                        .foregroundColor(rhPlotConfig.valueStickColor),
                     alignment: .leading
             )
                 .contentShape(Rectangle())
@@ -141,6 +178,7 @@ public extension RHInteractiveLinePlot where Indicator == GlowingIndicator {
         occupyingRelativeWidth: CGFloat = 1.0,
         showGlowingIndicator: Bool = false,
         lineSegmentStartingIndices: [Int]? = nil,
+        segmentSearchStrategy: SegmentSearchStrategy = .binarySearch,
         didSelectValueAtIndex: ((Int?) -> Void)? = nil,
         didSelectSegmentAtIndex: ((Int?) -> Void)? = nil,
         @ViewBuilder
@@ -151,6 +189,7 @@ public extension RHInteractiveLinePlot where Indicator == GlowingIndicator {
             occupyingRelativeWidth: occupyingRelativeWidth,
             showGlowingIndicator: showGlowingIndicator,
             lineSegmentStartingIndices: lineSegmentStartingIndices,
+            segmentSearchStrategy: segmentSearchStrategy,
             didSelectValueAtIndex: didSelectValueAtIndex,
             didSelectSegmentAtIndex: didSelectSegmentAtIndex,
             customLatestValueIndicator: {
@@ -188,8 +227,15 @@ private extension RHInteractiveLinePlot {
             
             let activeSegment: Int?
             if let segments = self.lineSegmentStartingIndices,
-                let currentIndex = self.currentlySelectedIndex {
-                activeSegment = binarySearchOrIndexToTheLeft(array: segments, value: currentIndex)
+                let currentIndex = self.currentlySelectedIndex
+            {
+                switch self.segmentSearchStrategy {
+                case .binarySearch:
+                    activeSegment = binarySearchOrIndexToTheLeft(array: segments, value: currentIndex)
+                case .cacheLookup:
+                    assert(self.valueIndexToSegmentIndexCache != nil, "Expect cache to be already built")
+                    activeSegment = self.valueIndexToSegmentIndexCache![currentIndex]
+                }
             } else {
                 activeSegment = nil
             }
