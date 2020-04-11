@@ -67,6 +67,15 @@ struct HomeView: View {
 
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
-        HomeView()
+        Group {
+            HomeView()
+//            ZStack {
+//                Rectangle().stroke(Color.red, lineWidth: 18).blur(radius: 2)
+//                    .frame(width: 100, height: 100)
+//                Rectangle().stroke()
+//                    .frame(width: 120, height: 120)
+//                    .border(Color.black).opacity(0.3)
+//            }
+        }
     }
 }

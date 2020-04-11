@@ -89,6 +89,12 @@ class RobinhoodPageViewModel: ObservableObject {
         logic.fetch(timeSeriesType: .weekly)
         logic.fetch(timeSeriesType: .monthly)
     }
+    
+    func cancelAllFetchesOnDisappear() {
+        logic.storage.forEach { (c) in
+            c.cancel()
+        }
+    }
 }
 
 struct RobinhoodPage: View {
@@ -138,6 +144,8 @@ struct RobinhoodPage: View {
             c.useLaserLightLinePlotStyle = isLaserModeOn
         })).onAppear {
             self.viewModel.fetchOnAppear()
+        }.onDisappear {
+            self.viewModel.cancelAllFetchesOnDisappear()
         }
     }
 }
@@ -162,7 +170,9 @@ extension RobinhoodPage {
                 self.currentIndex = ind
         },
             didSelectSegmentAtIndex: { segmentIndex in
-                Haptic.onChangeLineSegment()
+                if segmentIndex != nil {
+                    Haptic.onChangeLineSegment()
+                }
         },
             valueStickLabel: { value in
                 Text("\(dateString)")

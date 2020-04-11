@@ -24,7 +24,7 @@ class RobinhoodPageBusinessLogic {
         .monthly: \.monthlyResponse
     ]
     
-    private var storage = Set<AnyCancellable>()
+    var storage = Set<AnyCancellable>()
     
     init(symbol: String) {
         self.symbol = symbol
