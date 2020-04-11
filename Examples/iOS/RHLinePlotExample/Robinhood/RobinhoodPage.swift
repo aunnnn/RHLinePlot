@@ -161,6 +161,9 @@ extension RobinhoodPage {
             didSelectValueAtIndex: { ind in
                 self.currentIndex = ind
         },
+            didSelectSegmentAtIndex: { segmentIndex in
+                Haptic.onChangeLineSegment()
+        },
             valueStickLabel: { value in
                 Text("\(dateString)")
                     .foregroundColor(.gray)

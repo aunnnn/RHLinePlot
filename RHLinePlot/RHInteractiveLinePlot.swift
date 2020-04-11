@@ -17,7 +17,7 @@ public struct RHInteractiveLinePlot<StickLabel, Indicator>: View
         case binarySearch
         
         /// Store mapping of value index -> segment index for O(1) lookup. However we keep an extra O(no. of `values`) space.
-        case cacheLookup
+//        case cacheLookup
     }
     
     let values: [Value]
@@ -72,10 +72,10 @@ public struct RHInteractiveLinePlot<StickLabel, Indicator>: View
         self.customLatestValueIndicator = customLatestValueIndicator
         self.segmentSearchStrategy = segmentSearchStrategy
         
-        if let segments = lineSegmentStartingIndices, segmentSearchStrategy == .cacheLookup {
-            self.valueIndexToSegmentIndexCache = buildSegmentLookupCache(segments: segments)
-            print("Cache Lookup Mode! \(self.valueIndexToSegmentIndexCache?.count)")
-        }
+//        if let segments = lineSegmentStartingIndices, segmentSearchStrategy == .cacheLookup {
+//            self.valueIndexToSegmentIndexCache = buildSegmentLookupCache(segments: segments)
+//            print("Cache Lookup Mode! \(self.valueIndexToSegmentIndexCache?.count)")
+//        }
     }
     
     private func buildSegmentLookupCache(segments: [Int]) -> [Int] {
@@ -232,15 +232,17 @@ private extension RHInteractiveLinePlot {
                 switch self.segmentSearchStrategy {
                 case .binarySearch:
                     activeSegment = binarySearchOrIndexToTheLeft(array: segments, value: currentIndex)
-                case .cacheLookup:
-                    assert(self.valueIndexToSegmentIndexCache != nil, "Expect cache to be already built")
-                    activeSegment = self.valueIndexToSegmentIndexCache![currentIndex]
+//                case .cacheLookup:
+//                    assert(self.valueIndexToSegmentIndexCache != nil, "Expect cache to be already built")
+//                    activeSegment = self.valueIndexToSegmentIndexCache![currentIndex]
                 }
             } else {
                 activeSegment = nil
             }
-            self.currentlySelectedSegmentIndex = activeSegment
-            self.didSelectSegmentAtIndex?(activeSegment)
+            if self.currentlySelectedSegmentIndex != activeSegment {
+                self.currentlySelectedSegmentIndex = activeSegment
+                self.didSelectSegmentAtIndex?(activeSegment)
+            }
         }
         .onEnded { (_) in
             self.draggableIndicatorOffset = maxWidth
@@ -248,8 +250,10 @@ private extension RHInteractiveLinePlot {
             self.currentlySelectedIndex = nil
             self.didSelectValueAtIndex?(nil)
             
-            self.currentlySelectedSegmentIndex = nil
-            self.didSelectSegmentAtIndex?(nil)
+            if self.currentlySelectedSegmentIndex != nil {
+                self.currentlySelectedSegmentIndex = nil
+                self.didSelectSegmentAtIndex?(nil)
+            }
         }
         return drag
     }
