@@ -71,7 +71,11 @@ extension RHLinePlot {
             }
             let lineWidth = self.rhLinePlotConfig.plotLineWidth
             if self.rhLinePlotConfig.useLaserLightLinePlotStyle {
-                return AnyView(path.laserLightStroke(lineWidth: lineWidth).opacity(self.getOpacity(forSegment: i)))
+                return AnyView(
+                    path.laserLightStroke(lineWidth: lineWidth)
+                        .drawingGroup()
+                        .opacity(self.getOpacity(forSegment: i))
+                )
             } else {
                 return AnyView(path.stroke(style: StrokeStyle(
                     lineWidth: lineWidth,
