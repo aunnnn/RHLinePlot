@@ -15,7 +15,7 @@ struct StocksAPI {
         
     let symbol: String
     let timeSeriesType: TimeSeriesType
-    var apiKey = "demo" // "LE83V4CUPF341S53"
+    var apiKey = "demo"
     
     var fullURL: URL {
         URL(string: "\(Self.baseURL)\(query)")!

@@ -73,31 +73,62 @@ public struct RHLinePlot<Indicator: View>: View {
         }
     }
     
+    @ViewBuilder
+    public func plotBody(canvasFrame: CGRect) -> some View {
+        if self.lineSegmentStartingIndices != nil {
+            self.drawPlotWithSegmentedLines(canvasFrame: canvasFrame, lineSegmentStartingIndices: self.lineSegmentStartingIndices!)
+        } else {
+            self.drawPlotWithOneLine(canvasFrame: canvasFrame)
+        }
+    }
+    
+    public func glowingIndicator(canvasFrame: CGRect) -> some View {
+        // We use a small rectangle as a base (and offset it to the latest plot value).
+        // Then we center the indicator on top of this base.
+        let ind = self.getGlowingIndicatorLocation(canvasFrame: canvasFrame)
+        return Rectangle()
+            .frame(width: 10, height: 10)
+            .opacity(0)
+            .overlay(self.customLatestValueIndicator(), alignment: .center)
+            .transformEffect(.init(translationX: ind.width-5, y: ind.height-5))
+    }
+    
     public var body: some View {
-        GeometryReader { proxy in
-            ZStack(alignment: .topLeading) {
-                
-                Group {
-                    if self.lineSegmentStartingIndices != nil {
-                        self.drawPlotWithSegmentedLines(proxy: proxy, lineSegmentStartingIndices: self.lineSegmentStartingIndices!)
-                    } else {
-                        self.drawPlotWithOneLine(proxy: proxy)
-                    }
-                }
-                
-                if self.showGlowingIndicator {
-                    bindView(data: self.getGlowingIndicatorLocation(proxy: proxy)) { ind in
-                        // We use a small rectangle as a base (and offset it to the latest plot value).
-                        // Then we center the indicator on top of this base.
-                        Rectangle()
-                            .frame(width: 10, height: 10)
-                            .opacity(0)
-                            .overlay(self.customLatestValueIndicator(), alignment: .center)
-                            .transformEffect(.init(translationX: ind.width-5, y: ind.height-5))
+        GeometryReader { (proxy: GeometryProxy) in
+            // Bug? if I do `let canvasFrame ...` here and return view, compiler isn't happy.
+            bindView(data: self.getFinalCanvasFrame(proxy: proxy)) { (canvasFrame) in
+                ZStack(alignment: .topLeading) {
+                    self.plotBody(canvasFrame: canvasFrame)
+                    if self.showGlowingIndicator {
+                        self.glowingIndicator(canvasFrame: canvasFrame)
                     }
                 }
             }
         }
+    }
+    
+    func getFinalCanvasFrame(proxy: GeometryProxy) -> CGRect {
+        // ***Fix unintended blur clipping from using `.drawingGroup()` on laser mode.
+        // The solution here is to shrink the canvas.
+        // ----------------------------------------------------------------------------------
+        // When we use `drawingGroup()` the blurring part that extends beyond the path frame
+        // seems to be clipped off.
+        //
+        // (Probably the cache image doesn't consider out of bounds
+        // since it's needed to be composed unopaquely with layers below.)
+        let canvasFrame: CGRect
+        if rhLinePlotConfig.useLaserLightLinePlotStyle {
+            let lineWidth = rhLinePlotConfig.plotLineWidth
+            // Since biggest laser stroke & blur is L = 3 x lineWidth.
+            // We estimate the width of extension part (on each side)
+            // by using half of L stroke, and full blur radius of L.
+            // 0.5*L + 1*L = 4.5*L
+            let adjustedEachBorderDueToBlur: CGFloat = 4.5 * lineWidth
+            canvasFrame = CGRect(x: 0, y: adjustedEachBorderDueToBlur, width: proxy.size.width, height: proxy.size.height - 2*adjustedEachBorderDueToBlur)
+        } else {
+            canvasFrame = CGRect(x: 0, y: 0, width: proxy.size.width, height: proxy.size.height)
+        }
+        return canvasFrame
     }
 }
 
@@ -129,11 +160,11 @@ private func bindView<D, V: View>(data: D, transform: (D) -> V) -> V {
 // MARK:- Misc
 extension RHLinePlot {
     
-    func getGlowingIndicatorLocation(proxy: GeometryProxy) -> CGSize {
-        let HEIGHT = proxy.size.height
+    func getGlowingIndicatorLocation(canvasFrame: CGRect) -> CGSize {
+        let HEIGHT = canvasFrame.size.height
         let (highest, lowest) = findHighestAndLowest(values: values)
         
-        let x: CGFloat = occupyingRelativeWidth * proxy.size.width
+        let x: CGFloat = occupyingRelativeWidth * canvasFrame.size.width
         
         // If all values are equal, display at the middle
         if highest == lowest {
@@ -143,7 +174,7 @@ extension RHLinePlot {
         let relativeY = CGFloat(values.last! - lowest) / CGFloat(highest - lowest)
         let y = (1 - relativeY) * HEIGHT
         
-        return CGSize(width: x, height: y)
+        return CGSize(width: canvasFrame.origin.x + x, height: canvasFrame.origin.y + y)
     }
     
     func getOpacity(forSegment segment: Int) -> Double {

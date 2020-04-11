@@ -10,9 +10,10 @@ import SwiftUI
 
 extension RHLinePlot {
     
-    func drawPlotWithSegmentedLines(proxy: GeometryProxy, lineSegmentStartingIndices: [Int]) -> some View {
-        let WIDTH = proxy.size.width * occupyingRelativeWidth
-        let HEIGHT = proxy.size.height
+    func drawPlotWithSegmentedLines(canvasFrame: CGRect, lineSegmentStartingIndices: [Int]) -> some View {
+        let WIDTH = canvasFrame.size.width * occupyingRelativeWidth
+        let HEIGHT = canvasFrame.size.height
+        
         let lineSectionLength = (WIDTH/CGFloat(values.count - 1))
         
         let (highest, lowest) = findHighestAndLowest(values: values)
@@ -44,7 +45,7 @@ extension RHLinePlot {
             assert(inverseValueHeightDifference != nil)
             var currentY = (1 - inverseValueHeightDifference! * previousYPosition) * HEIGHT
             
-            path.move(to: CGPoint(x: currentX, y: currentY))
+            path.move(to: CGPoint(x: canvasFrame.origin.x + currentX, y: canvasFrame.origin.y + currentY))
             
             // Draw segments of (currentX, nextX)
             for v in segmentValues {
@@ -52,9 +53,9 @@ extension RHLinePlot {
                 let nextY = (1 - inverseValueHeightDifference! * CGFloat(v - lowest)) * HEIGHT
                 if currentX < 0 {
                     // *Handle when previousIndex is -1,  currentX will be negative. We won't addLine here yet, just move.
-                    path.move(to: CGPoint(x: nextX, y: nextY))
+                    path.move(to: CGPoint(x: canvasFrame.origin.x + nextX, y: canvasFrame.origin.y + nextY))
                 } else {
-                    path.addLine(to: CGPoint(x: nextX, y: nextY))
+                    path.addLine(to: CGPoint(x: canvasFrame.origin.x + nextX, y: canvasFrame.origin.y + nextY))
                 }
                 currentX = nextX
                 currentY = nextY
@@ -73,7 +74,7 @@ extension RHLinePlot {
             if self.rhLinePlotConfig.useLaserLightLinePlotStyle {
                 return AnyView(
                     path.laserLightStroke(lineWidth: lineWidth)
-                        .drawingGroup()
+                        .drawingGroup() // much more responsive for laser mode
                         .opacity(self.getOpacity(forSegment: i))
                 )
             } else {

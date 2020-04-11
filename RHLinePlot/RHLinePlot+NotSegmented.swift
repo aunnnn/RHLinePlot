@@ -10,9 +10,9 @@ import SwiftUI
 
 extension RHLinePlot {
     
-    private func plotPathWithOneLine(proxy: GeometryProxy) -> Path {
-        let WIDTH = occupyingRelativeWidth * proxy.size.width
-        let HEIGHT = proxy.size.height
+    private func plotPathWithOneLine(canvasFrame: CGRect) -> Path {
+        let WIDTH = occupyingRelativeWidth * canvasFrame.size.width
+        let HEIGHT = canvasFrame.size.height
         let lineSectionLength = (WIDTH/CGFloat(values.count - 1))
         
         let (highest, lowest) = findHighestAndLowest(values: values)
@@ -39,8 +39,8 @@ extension RHLinePlot {
         }
     }
     
-    func drawPlotWithOneLine(proxy: GeometryProxy) -> some View {
-        plotPathWithOneLine(proxy: proxy)
+    func drawPlotWithOneLine(canvasFrame: CGRect) -> some View {
+        plotPathWithOneLine(canvasFrame: canvasFrame)
             .stroke(style: StrokeStyle(
                 lineWidth: self.rhLinePlotConfig.plotLineWidth,
                 lineCap: .round,
