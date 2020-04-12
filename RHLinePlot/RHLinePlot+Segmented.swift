@@ -11,6 +11,24 @@ import SwiftUI
 extension RHLinePlot {
     
     func drawPlotWithSegmentedLines(canvasFrame: CGRect, lineSegmentStartingIndices: [Int]) -> some View {
+        // In laser light mode for segmented lines, we use `drawingGroup()` to make it more responsive,
+        // but the blurry parts at the edges will be clipped off
+        // at the edge of the path canvas.
+        //
+        // FIX: Here we make the canvas virtually larger to provide padding
+        // so that when the edges are cut off, blurry part is still there.
+        let adjustedEachBorderDueToBlur: CGFloat = {
+            if rhLinePlotConfig.useLaserLightLinePlotStyle {
+                return 7.5 * rhLinePlotConfig.plotLineWidth
+            } else {
+                return 0
+            }
+        }()
+        let largerCanvas = canvasFrame.insetBy(dx: -adjustedEachBorderDueToBlur, dy: -adjustedEachBorderDueToBlur)
+        
+        let pathBaseX: CGFloat = adjustedEachBorderDueToBlur
+        let pathBaseY: CGFloat = adjustedEachBorderDueToBlur
+        
         let WIDTH = canvasFrame.width * occupyingRelativeWidth
         let HEIGHT = canvasFrame.height
         
@@ -38,23 +56,23 @@ extension RHLinePlot {
             if allValuesAreEqual {
                 path.move(to:
                     CGPoint(
-                        x: canvasFrame.minX + currentX,
-                        y: canvasFrame.minY + HEIGHT * (1 - self.rhLinePlotConfig.relativeYForStraightLine)))
+                        x: pathBaseX + currentX,
+                        y: pathBaseY + HEIGHT * (1 - self.rhLinePlotConfig.relativeYForStraightLine)))
                 
                 currentX += lineSectionLength * CGFloat(segmentValues.count)
                 
                 path.addLine(to:
                     CGPoint(
-                        x: canvasFrame.minX + currentX,
-                        y: canvasFrame.minY + HEIGHT/2))
+                        x: pathBaseX + currentX,
+                        y: pathBaseY + HEIGHT/2))
                 return
             }
             
             assert(inverseValueHeightDifference != nil)
             var currentY = (1 - inverseValueHeightDifference! * previousYPosition) * HEIGHT
             
-            path.move(to: CGPoint(x: canvasFrame.minX + currentX,
-                                  y: canvasFrame.minY + currentY))
+            path.move(to: CGPoint(x: pathBaseX + currentX,
+                                  y: pathBaseY + currentY))
             
             // Draw segments of (currentX, nextX)
             for v in segmentValues {
@@ -62,9 +80,9 @@ extension RHLinePlot {
                 let nextY = (1 - inverseValueHeightDifference! * CGFloat(v - lowest)) * HEIGHT
                 if currentX < 0 {
                     // *Handle when previousIndex is -1,  currentX will be negative. We won't addLine here yet, just move.
-                    path.move(to: CGPoint(x: canvasFrame.minX + nextX, y: canvasFrame.minY + nextY))
+                    path.move(to: CGPoint(x: pathBaseX + nextX, y: pathBaseY + nextY))
                 } else {
-                    path.addLine(to: CGPoint(x: canvasFrame.minX + nextX, y: canvasFrame.minY + nextY))
+                    path.addLine(to: CGPoint(x: pathBaseX + nextX, y: pathBaseY + nextY))
                 }
                 currentX = nextX
                 currentY = nextY
@@ -83,7 +101,9 @@ extension RHLinePlot {
             if self.rhLinePlotConfig.useLaserLightLinePlotStyle {
                 return AnyView(
                     path.laserLightStroke(lineWidth: lineWidth)
-                        .drawingGroup() // much more responsive for laser mode
+                        // much more responsive for laser mode to opacity animation,
+                        // but we have to fix its unintended effects.
+                        .drawingGroup()
                         .opacity(self.getOpacity(forSegment: i))
                 )
             } else {
@@ -94,13 +114,26 @@ extension RHLinePlot {
                 )).opacity(self.getOpacity(forSegment: i)))
             }
         }
-        return ZStack {
-            ForEach(segments, id: \.self.0) { (i, s) in
-                pathForSegment(i: i, s: s)
-            }
-            .animation(
-                .linear(duration: self.rhLinePlotConfig.segmentSelectionAnimationDuration)
-            )
-        }
+        
+        // These invisible overlays are just for working in different coordinates
+        // due to the adjustment hack above.
+        return Rectangle().opacity(0) // Original plot size
+            .overlay(
+                Rectangle().opacity(0) // Adjusted edges (canvasFrame) size
+                    .frame(width: canvasFrame.width, height: canvasFrame.height)
+                    .overlay(
+                        ZStack { // *Actual plot content*
+                            ForEach(segments, id: \.self.0) { (i, s) in
+                                pathForSegment(i: i, s: s)
+                            }
+                            .animation(
+                                .linear(duration: self.rhLinePlotConfig.segmentSelectionAnimationDuration)
+                            )
+                        }
+                        .frame(width: largerCanvas.width, height: largerCanvas.height) // Plot in a larger canvas
+                        .offset(x: canvasFrame.minX, y: canvasFrame.minY) // Offset to the right adjust edge location.
+                )
+                ,
+                alignment: .topLeading)
     }
 }

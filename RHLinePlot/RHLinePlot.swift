@@ -162,59 +162,37 @@ extension RHLinePlot {
     }
 }
 
+
+/// Get canvas frame after considering edges in `adjustedEdgesToFitLineStrokeInCanvas` config.
+///
+/// This will inset the proxy frame by half of stroke width (`plotLineWidth`).
 func getAdjustedStrokeEdgesCanvasFrame(proxy: GeometryProxy, rhLinePlotConfig: RHLinePlotConfig) -> CGRect {
-    // ***Fix unintended blur clipping from using `.drawingGroup()` on laser mode.
-    // The solution here is to shrink the canvas height.
-    // ----------------------------------------------------------------------------------
-    // When we use `drawingGroup()` the blurring part that extends beyond the path frame
-    // seems to be clipped off.
-    //
-    // (Probably the cache image doesn't consider out of bounds
-    // since it's needed to be composed unopaquely with layers below.)
-    
-    // If laser mode, always adjusts
-    if rhLinePlotConfig.useLaserLightLinePlotStyle {
-        let lineWidth = rhLinePlotConfig.plotLineWidth
-        // magic number here...
-        // L = 3*lineWidth (biggest laser stroke)
-        // stroke = 0.5*L
-        // blur radius = 2*R = 2*L
-        // 2.5*L = 7.5*lineWidth is the safest. But we stick with 7 here.
-        let adjustedEachBorderDueToBlur: CGFloat = 7 * lineWidth
-        return CGRect(
-            x: adjustedEachBorderDueToBlur,
-            y: adjustedEachBorderDueToBlur,
-            width: proxy.size.width - 2*adjustedEachBorderDueToBlur,
-            height: proxy.size.height - 2*adjustedEachBorderDueToBlur)
-    } else {
-        let adjustedEdges = rhLinePlotConfig.adjustedEdgesToFitLineStrokeInCanvas
-        if !adjustedEdges.isEmpty {
-            var x: CGFloat = 0
-            var y: CGFloat = 0
-            var width: CGFloat = proxy.size.width
-            var height: CGFloat = proxy.size.height
-            
-            let adjustedValue = rhLinePlotConfig.plotLineWidth/2
-            if adjustedEdges.contains(.top) {
-                y += adjustedValue
-                height -= adjustedValue
-            }
-            if adjustedEdges.contains(.bottom) {
-                height -= adjustedValue
-            }
-            if adjustedEdges.contains(.leading) {
-                x += adjustedValue
-                width -= adjustedValue
-            }
-            if adjustedEdges.contains(.trailing) {
-                width -= adjustedValue
-            }
-            return CGRect(x: x, y: y, width: width, height: height)
-        } else {
-            // No adjustment
-            return CGRect(x: 0, y: 0, width: proxy.size.width, height: proxy.size.height)
-        }
+    let adjustedEdges = rhLinePlotConfig.adjustedEdgesToFitLineStrokeInCanvas
+    if adjustedEdges.isEmpty {
+        return CGRect(x: 0, y: 0, width: proxy.size.width, height: proxy.size.height)
     }
+    
+    var x: CGFloat = 0
+    var y: CGFloat = 0
+    var width: CGFloat = proxy.size.width
+    var height: CGFloat = proxy.size.height
+    
+    let adjustedValue = rhLinePlotConfig.plotLineWidth/2
+    if adjustedEdges.contains(.top) {
+        y += adjustedValue
+        height -= adjustedValue
+    }
+    if adjustedEdges.contains(.bottom) {
+        height -= adjustedValue
+    }
+    if adjustedEdges.contains(.leading) {
+        x += adjustedValue
+        width -= adjustedValue
+    }
+    if adjustedEdges.contains(.trailing) {
+        width -= adjustedValue
+    }
+    return CGRect(x: x, y: y, width: width, height: height)
 }
 
 struct RHLinePlot_Previews: PreviewProvider {

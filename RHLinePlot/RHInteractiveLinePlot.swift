@@ -146,7 +146,7 @@ public struct RHInteractiveLinePlot<StickLabel, Indicator>: View
             return CGAffineTransform(translationX: centeringClamped, y: 0)
         }
         
-        return VStack(spacing: rhPlotConfig.gapBetweenPlotAndStickLabel) {
+        return VStack(spacing: rhPlotConfig.spaceBetweenValueStickAndStickLabel) {
             
             // Value Stick Label
             // HACK: We get a dynamic size of value stick label through `overlay`.

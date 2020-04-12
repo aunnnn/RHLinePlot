@@ -41,11 +41,17 @@ extension RHLinePlot {
     }
     
     func drawPlotWithOneLine(canvasFrame: CGRect) -> some View {
-        plotPathWithOneLine(canvasFrame: canvasFrame)
-            .stroke(style: StrokeStyle(
-                lineWidth: self.rhLinePlotConfig.plotLineWidth,
-                lineCap: .round,
-                lineJoin: .round
-            ))
+        let lineWidth = self.rhLinePlotConfig.plotLineWidth
+        if self.rhLinePlotConfig.useLaserLightLinePlotStyle {
+            return AnyView(plotPathWithOneLine(canvasFrame: canvasFrame)
+                .laserLightStroke(lineWidth: lineWidth))
+        } else {
+            return AnyView(plotPathWithOneLine(canvasFrame: canvasFrame)
+                .stroke(style: StrokeStyle(
+                    lineWidth: lineWidth,
+                    lineCap: .round,
+                    lineJoin: .round
+                )))
+        }
     }
 }

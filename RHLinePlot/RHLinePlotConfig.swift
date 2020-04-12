@@ -68,9 +68,15 @@ public struct RHLinePlotConfig {
     
     public var valueStickWidth: CGFloat = 1.2
     public var valueStickColor: Color = .gray
+    
+    /// Padding from the highest point of line plot to value stick. If `0`, the top of value stick will be at the same level of the highest point in plot.
     public var valueStickTopPadding: CGFloat = 28
+    
+    /// Padding from the lowest point of line plot to value stick. If `0`, the end of value stick will be at the same level of the lowest point in plot.
     public var valueStickBottomPadding: CGFloat = 28
-    public var gapBetweenPlotAndStickLabel: CGFloat = 8
+    
+    
+    public var spaceBetweenValueStickAndStickLabel: CGFloat = 8
     
     public static let `default` = RHLinePlotConfig()
     

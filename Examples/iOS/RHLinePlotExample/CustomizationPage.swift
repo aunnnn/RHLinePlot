@@ -14,6 +14,8 @@ import RHLinePlot
 struct CustomizationPage: View {
     let values: [CGFloat] = (0...30).map { _ in CGFloat.random(in: (0...100)) }
     
+    @State var currentlySelectedIndex: Int? = nil
+    
     @State var relativeWidth: CGFloat = 1
     @State var lineWidth: CGFloat = 1.5
     @State var showGlowingIndicator: Bool = true
@@ -68,6 +70,13 @@ struct CustomizationPage: View {
             c.adjustedEdgesToFitLineStrokeInCanvas = edges
         }
         
+        func valueStickLabel(_ value: CGFloat) -> some View {
+            let valueStr = String(format: "%.2f", value)
+            let index = self.currentlySelectedIndex ?? -1
+            let view = Text("\(valueStr), index \(index)").padding(2)
+            return view
+        }
+        
         return List {
             Section(header:
                 Text("Configure via initializer:")
@@ -95,8 +104,8 @@ struct CustomizationPage: View {
                     occupyingRelativeWidth: relativeWidth,
                     showGlowingIndicator: showGlowingIndicator,
                     lineSegmentStartingIndices: segments,
-                    didSelectValueAtIndex: { value in
-                        print("Select \(String(describing: value))")
+                    didSelectValueAtIndex: { index in
+                        self.currentlySelectedIndex = index
                 },
                     customLatestValueIndicator: {
                         if self.useCustomIndicator {
@@ -111,8 +120,7 @@ struct CustomizationPage: View {
                         }
                 },
                     valueStickLabel: { value in
-                        Text("\(String(format: "%.2f", value))")
-                            .padding(2)
+                        valueStickLabel(value)
                 })
                     .environment(\.rhLinePlotConfig, config)
                     .foregroundColor(.green)
@@ -129,7 +137,7 @@ struct CustomizationPage: View {
                     Text("Line width \(String(format: "%.2f", lineWidth))")
                     Slider(value: $lineWidth, in: (1...20))
                 }
-                Text("Adjusted Stroke Edges")
+                Text("Adjusted Stroke Edges (Increase line width to see its effect)")
                     .font(.callout)
                 HStack {
                     Toggle(isOn: $adjustTop) {
