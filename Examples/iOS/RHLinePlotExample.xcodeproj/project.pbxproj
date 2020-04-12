@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		303F60072442995E00DB8D0E /* RobinhoodPageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 303F60062442995E00DB8D0E /* RobinhoodPageViewModel.swift */; };
 		3093819A2441281C00028E71 /* StocksAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309381992441281C00028E71 /* StocksAPI.swift */; };
 		30A908A524403F6D0094A1FC /* RHLinePlot.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 301D1805243F2BF700032B96 /* RHLinePlot.framework */; };
 		30A908AB244044F60094A1FC /* RHLinePlot.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 301D1805243F2BF700032B96 /* RHLinePlot.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -21,7 +22,6 @@
 		30CACE24243F22A200C8669F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 30CACE22243F22A200C8669F /* LaunchScreen.storyboard */; };
 		30F9AEC5244183BC00E5BCEB /* StockAPIResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F9AEC4244183BC00E5BCEB /* StockAPIResponse.swift */; };
 		30F9AEC724418C2200E5BCEB /* Misc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F9AEC624418C2200E5BCEB /* Misc.swift */; };
-		30F9AEC92441950300E5BCEB /* RHFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F9AEC82441950300E5BCEB /* RHFont.swift */; };
 		30F9AECB24419FCC00E5BCEB /* TimeDisplayModeSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F9AECA24419FCC00E5BCEB /* TimeDisplayModeSelector.swift */; };
 		30F9AECD2441A04400E5BCEB /* TimeDisplayMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F9AECC2441A04400E5BCEB /* TimeDisplayMode.swift */; };
 		30F9AECF2441A0E400E5BCEB /* Haptic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F9AECE2441A0E400E5BCEB /* Haptic.swift */; };
@@ -44,6 +44,7 @@
 
 /* Begin PBXFileReference section */
 		301D1805243F2BF700032B96 /* RHLinePlot.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RHLinePlot.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		303F60062442995E00DB8D0E /* RobinhoodPageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RobinhoodPageViewModel.swift; sourceTree = "<group>"; };
 		309381992441281C00028E71 /* StocksAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StocksAPI.swift; sourceTree = "<group>"; };
 		30A908AC244045E90094A1FC /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		30A908AE244046560094A1FC /* BasicUsagePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicUsagePage.swift; sourceTree = "<group>"; };
@@ -58,7 +59,6 @@
 		30CACE25243F22A200C8669F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		30F9AEC4244183BC00E5BCEB /* StockAPIResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockAPIResponse.swift; sourceTree = "<group>"; };
 		30F9AEC624418C2200E5BCEB /* Misc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Misc.swift; sourceTree = "<group>"; };
-		30F9AEC82441950300E5BCEB /* RHFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RHFont.swift; sourceTree = "<group>"; };
 		30F9AECA24419FCC00E5BCEB /* TimeDisplayModeSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeDisplayModeSelector.swift; sourceTree = "<group>"; };
 		30F9AECC2441A04400E5BCEB /* TimeDisplayMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeDisplayMode.swift; sourceTree = "<group>"; };
 		30F9AECE2441A0E400E5BCEB /* Haptic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptic.swift; sourceTree = "<group>"; };
@@ -89,14 +89,14 @@
 			isa = PBXGroup;
 			children = (
 				30A908B0244078950094A1FC /* RobinhoodPage.swift */,
+				303F60062442995E00DB8D0E /* RobinhoodPageViewModel.swift */,
 				30F9AECA24419FCC00E5BCEB /* TimeDisplayModeSelector.swift */,
-				309381992441281C00028E71 /* StocksAPI.swift */,
-				30F9AEC4244183BC00E5BCEB /* StockAPIResponse.swift */,
-				30F9AEC624418C2200E5BCEB /* Misc.swift */,
 				30F9AECC2441A04400E5BCEB /* TimeDisplayMode.swift */,
-				30F9AEC82441950300E5BCEB /* RHFont.swift */,
-				30F9AECE2441A0E400E5BCEB /* Haptic.swift */,
 				30F9AED02441AA8800E5BCEB /* RobinhoodPageBusinessLogic.swift */,
+				30F9AEC4244183BC00E5BCEB /* StockAPIResponse.swift */,
+				309381992441281C00028E71 /* StocksAPI.swift */,
+				30F9AECE2441A0E400E5BCEB /* Haptic.swift */,
+				30F9AEC624418C2200E5BCEB /* Misc.swift */,
 			);
 			path = Robinhood;
 			sourceTree = "<group>";
@@ -224,8 +224,8 @@
 				30F9AECD2441A04400E5BCEB /* TimeDisplayMode.swift in Sources */,
 				30A908B1244078950094A1FC /* RobinhoodPage.swift in Sources */,
 				30A908AF244046560094A1FC /* BasicUsagePage.swift in Sources */,
-				30F9AEC92441950300E5BCEB /* RHFont.swift in Sources */,
 				3093819A2441281C00028E71 /* StocksAPI.swift in Sources */,
+				303F60072442995E00DB8D0E /* RobinhoodPageViewModel.swift in Sources */,
 				30F9AEC5244183BC00E5BCEB /* StockAPIResponse.swift in Sources */,
 				30CACE1C243F22A000C8669F /* CustomizationPage.swift in Sources */,
 				30F9AECF2441A0E400E5BCEB /* Haptic.swift in Sources */,

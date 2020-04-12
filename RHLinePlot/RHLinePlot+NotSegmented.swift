@@ -11,8 +11,8 @@ import SwiftUI
 extension RHLinePlot {
     
     private func plotPathWithOneLine(canvasFrame: CGRect) -> Path {
-        let WIDTH = occupyingRelativeWidth * canvasFrame.size.width
-        let HEIGHT = canvasFrame.size.height
+        let WIDTH = occupyingRelativeWidth * canvasFrame.width
+        let HEIGHT = canvasFrame.height
         let lineSectionLength = (WIDTH/CGFloat(values.count - 1))
         
         let (highest, lowest) = findHighestAndLowest(values: values)
@@ -20,8 +20,8 @@ extension RHLinePlot {
         if highest == lowest {
             // All data points are equal, just draw a straight line in the middle
             return Path { path in
-                path.move(to: CGPoint(x: 0, y: HEIGHT/2))
-                path.addLine(to: CGPoint(x: WIDTH, y: HEIGHT/2))
+                path.move(to: CGPoint(x: canvasFrame.minX + 0, y: canvasFrame.minY + HEIGHT/2))
+                path.addLine(to: CGPoint(x: canvasFrame.minX + WIDTH, y: canvasFrame.minY + HEIGHT/2))
             }
         }
         let inverseValueHeightDifference = 1/CGFloat(highest - lowest)
@@ -30,11 +30,12 @@ extension RHLinePlot {
         var currentY: CGFloat = (1 - inverseValueHeightDifference * CGFloat(values[0] - lowest)) * HEIGHT
         
         return Path { path in
-            path.move(to: CGPoint(x: currentX, y: currentY))
+            path.move(to: CGPoint(x: canvasFrame.minX + currentX, y: canvasFrame.minY + currentY))
             for i in (1..<values.count) {
                 currentX += lineSectionLength
                 currentY = (1 - inverseValueHeightDifference * CGFloat(values[i] - lowest)) * HEIGHT
-                path.addLine(to: CGPoint(x: currentX, y: currentY))
+                path.addLine(to: CGPoint(x: canvasFrame.minX + currentX,
+                                         y: canvasFrame.minY + currentY))
             }
         }
     }

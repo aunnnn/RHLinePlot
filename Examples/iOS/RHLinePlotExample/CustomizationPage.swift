@@ -26,6 +26,11 @@ struct CustomizationPage: View {
     
     @State var useCustomIndicator = false
     
+    @State var adjustTop = false
+    @State var adjustBottom = false
+    @State var adjustLeading = false
+    @State var adjustTrailing = false
+    
     func refreshPlot() {
         print("Refresh plot...")
         showGlowingIndicator.toggle()
@@ -54,13 +59,34 @@ struct CustomizationPage: View {
             c.glowingIndicatorDelayBetweenGlow = self.glowingDelayBetweenGlows
             c.segmentSelectionAnimationDuration = self.segmentAnimationDuration
             c.useLaserLightLinePlotStyle = self.isLaserModeOn
+            
+            var edges = Edge.Set()
+            if self.adjustTop { edges.insert(.top) }
+            if self.adjustBottom { edges.insert(.bottom) }
+            if self.adjustLeading { edges.insert(.leading) }
+            if self.adjustTrailing { edges.insert(.trailing) }
+            c.adjustedEdgesToFitLineStrokeInCanvas = edges
         }
         
         return List {
-            Section {
+            Section(header:
+                Text("Configure via initializer:")
+                    .font(.callout)
+            ) {
+                
+                HStack {
+                    Text("Relative width \(String(format: "%.2f", relativeWidth))")
+                    Slider(value: $relativeWidth, in: (0...1))
+                }
+                
                 Toggle(isOn: $useCustomIndicator) {
                     Text("Use custom indicator")
                 }
+                
+                Toggle(isOn: $showGlowingIndicator) {
+                    Text("Show glowing indicator")
+                }
+                
             }
             
             Section {
@@ -76,6 +102,7 @@ struct CustomizationPage: View {
                         if self.useCustomIndicator {
                             AnyView(
                                 Text("CUSTOM")
+                                    .bold()
                                     .font(.callout)
                                     .frame(width: 100, height: 40)
                             )
@@ -94,37 +121,37 @@ struct CustomizationPage: View {
             }
             
             Section(header:
-                Text("Configure via initializer:")
-                    .font(.callout)
-            ) {
-                
-                HStack {
-                    Text("Relative width \(String(format: "%.2f", relativeWidth))")
-                    Slider(value: $relativeWidth, in: (0...1))
-                }
-                
-                Toggle(isOn: $showGlowingIndicator) {
-                    Text("Show glowing indicator")
-                }
-                
-            }
-            
-            Section(header:
                 Text("Configure via RHLinePlotConfig environment.")
                     .font(.callout)
                     .foregroundColor(.green)
             ) {
                 HStack {
                     Text("Line width \(String(format: "%.2f", lineWidth))")
-                    Slider(value: $lineWidth, in: (1...4))
+                    Slider(value: $lineWidth, in: (1...20))
                 }
+                Text("Adjusted Stroke Edges")
+                    .font(.callout)
                 HStack {
-                    Text("Segment animation duration \(String(format: "%.2f", segmentAnimationDuration))")
-                    Slider(value: $segmentAnimationDuration, in: (0.01...0.6))
+                    Toggle(isOn: $adjustTop) {
+                        Text("Top")
+                    }
+                    Toggle(isOn: $adjustBottom) {
+                        Text("Bottom")
+                    }
+                    Toggle(isOn: $adjustLeading) {
+                        Text("Leading")
+                    }
+                    Toggle(isOn: $adjustTrailing) {
+                        Text("Trailing")
+                    }
                 }
                 HStack {
                     Text("Indicator width \(String(format: "%.2f", indicatorWidth))")
                     Slider(value: $indicatorWidth, in: (4...20))
+                }
+                HStack {
+                    Text("Segment animation duration \(String(format: "%.2f", segmentAnimationDuration))")
+                    Slider(value: $segmentAnimationDuration, in: (0.01...0.6))
                 }
             }
             

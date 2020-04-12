@@ -46,7 +46,23 @@ public struct RHLinePlotConfig {
     public var glowingIndicatorDelayBetweenGlow: Double = 0.5
     public var glowingIndicatorGlowAnimationDuration: Double = 0.8
     
+    /// Use laser stroke mode to plot lines.
+    ///
+    /// Note that your plot will be automatically shrinked so that the blurry part fits inside the canvas.
     public var useLaserLightLinePlotStyle: Bool = false
+    
+    /// Use drawing group for laser light mode.
+    ///
+    /// This will increase responsiveness if there's a lot of segments.
+    /// **But, the blurry parts will be clipped off the canvas bounds.**
+//    public var useDrawingGroupForLaserLightLinePlotStyle: Bool = false
+    
+    /// The edges to fit the line strokes within canvas. This interacts with `plotLineWidth`. Default is `[]`.
+    ///
+    /// By default only the line skeletons (*paths*) exactly fits in the canvas,** without considering the `plotLineWidth`**.
+    /// So when you increase the line width, the edge of the extreme values could go out of the canvas.
+    /// You can provide a set of edges to consider to adjust to fit in canvas.
+    public var adjustedEdgesToFitLineStrokeInCanvas: Edge.Set = []
     
     // MARK:- RHInteractiveLinePlot
     

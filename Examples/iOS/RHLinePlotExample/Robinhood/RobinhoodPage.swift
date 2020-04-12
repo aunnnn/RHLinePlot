@@ -10,93 +10,6 @@ import Combine
 import SwiftUI
 import RHLinePlot
 
-extension CGFloat {
-    func round2Str() -> String {
-        String(format: "%.2f", self)
-    }
-}
-
-let rhThemeColor = Color(red: 33/255, green: 206/255, blue: 153/255)
-
-class RobinhoodPageViewModel: ObservableObject {
-    typealias PlotData = [(time: Date, price: CGFloat)]
-    
-    private let logic: RobinhoodPageBusinessLogic
-    
-    @Published var isLoading = false
-    @Published var intradayPlotData: PlotData?
-    @Published var dailyPlotData: PlotData?
-    @Published var weeklyPlotData: PlotData?
-    @Published var monthlyPlotData: PlotData?
-    
-    let symbol: String
-    
-    private var storage = Set<AnyCancellable>()
-    
-    init(symbol: String) {
-        self.symbol = symbol
-        self.logic = RobinhoodPageBusinessLogic(symbol: symbol)
-        
-        StocksAPI.networkActivity
-            .receive(on: RunLoop.main)
-            .assign(to: \.isLoading, on: self)
-            .store(in: &storage)
-        
-        logic.$dailyResponse
-            .compactMap(mapToPlotData)
-            .receive(on: RunLoop.main)
-            .assign(to: \.dailyPlotData, on: self)
-            .store(in: &storage)
-        
-        logic.$intradayResponse
-            .compactMap(mapToPlotData)
-            .receive(on: RunLoop.main)
-            .assign(to: \.intradayPlotData, on: self)
-            .store(in: &storage)
-        
-        let publishers = [
-            logic.$intradayResponse,
-            logic.$dailyResponse,
-            logic.$weeklyResponse,
-            logic.$monthlyResponse
-        ]
-        
-        let assignees: [ReferenceWritableKeyPath<RobinhoodPageViewModel, PlotData?>] = [
-            \.intradayPlotData,
-            \.dailyPlotData,
-            \.weeklyPlotData,
-            \.monthlyPlotData
-        ]
-        
-        zip(publishers, assignees)
-            .forEach { (tup) in
-                let (publisher, assignee) = tup
-                publisher
-                    .compactMap(mapToPlotData)
-                    .receive(on: RunLoop.main)
-                    .assign(to: assignee, on: self)
-                    .store(in: &storage)
-        }
-    }
-    
-    private func mapToPlotData(_ response: StockAPIResponse?) -> PlotData? {
-        response?.timeSeries.map { tup in (tup.time, CGFloat(tup.info.closePrice)) }
-    }
-    
-    func fetchOnAppear() {
-        logic.fetch(timeSeriesType: .intraday)
-        logic.fetch(timeSeriesType: .daily)
-        logic.fetch(timeSeriesType: .weekly)
-        logic.fetch(timeSeriesType: .monthly)
-    }
-    
-    func cancelAllFetchesOnDisappear() {
-        logic.storage.forEach { (c) in
-            c.cancel()
-        }
-    }
-}
-
 struct RobinhoodPage: View {
     typealias PlotData = RobinhoodPageViewModel.PlotData
     static let symbol = "IBM"
@@ -116,6 +29,36 @@ struct RobinhoodPage: View {
             return viewModel.weeklyPlotData
         case .monthly:
             return viewModel.monthlyPlotData
+        }
+    }
+    
+    var plotDataSegments: [Int]? {
+        guard let currentPlotData = currentPlotData else { return nil }
+        switch timeDisplayMode {
+        case .hourly:
+            return RobinhoodPageViewModel.segmentByHours(values: currentPlotData)
+        case .daily:
+            return RobinhoodPageViewModel.segmentByMonths(values: currentPlotData)
+        case .weekly, .monthly:
+            return RobinhoodPageViewModel.segmentByYears(values: currentPlotData)
+        }
+    }
+    
+    var plotRelativeWidth: CGFloat {
+        switch timeDisplayMode {
+        case .hourly:
+            return 0.7 // simulate today's data
+        default:
+            return 1.0
+        }
+    }
+    
+    var showGlowingIndicator: Bool {
+        switch timeDisplayMode {
+        case .hourly:
+            return true // simulate today's data
+        default:
+            return false
         }
     }
     
@@ -154,7 +97,6 @@ struct RobinhoodPage: View {
 extension RobinhoodPage {
     func plotBody(plotData: PlotData) -> some View {
         let values = plotData.map { $0.price }
-        let segments = Array(stride(from: 0, to: values.count, by: 16))
         let currentIndex = self.currentIndex ?? (values.count - 1)
         // For value stick
         let dateString = timeDisplayMode.dateFormatter()
@@ -164,7 +106,7 @@ extension RobinhoodPage {
             values: values,
             occupyingRelativeWidth: 0.7,
             showGlowingIndicator: true,
-            lineSegmentStartingIndices: segments,
+            lineSegmentStartingIndices: plotDataSegments,
             segmentSearchStrategy: .binarySearch,
             didSelectValueAtIndex: { ind in
                 self.currentIndex = ind

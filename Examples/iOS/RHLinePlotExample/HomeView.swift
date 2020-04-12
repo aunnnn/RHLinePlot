@@ -70,11 +70,17 @@ struct HomeView_Previews: PreviewProvider {
         Group {
             HomeView()
 //            ZStack {
-//                Rectangle().stroke(Color.red, lineWidth: 18).blur(radius: 2)
+//                Rectangle().stroke(Color.red, lineWidth: 20).blur(radius: 10)
 //                    .frame(width: 100, height: 100)
 //                Rectangle().stroke()
-//                    .frame(width: 120, height: 120)
+//                    .frame(width: 100, height: 100)
 //                    .border(Color.black).opacity(0.3)
+//                Rectangle().stroke()
+//                    .frame(width: 120, height: 120)
+//                    .border(Color.green).opacity(0.3)
+//                Rectangle().stroke()
+//                    .frame(width: 160, height: 160)
+//                    .border(Color.green).opacity(0.3)
 //            }
         }
     }

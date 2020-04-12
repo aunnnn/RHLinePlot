@@ -16,8 +16,10 @@ public struct RHInteractiveLinePlot<StickLabel, Indicator>: View
         /// Use binary search to search for active segment in O(log(no. of segments)). No extra space needed.
         case binarySearch
         
-        /// Store mapping of value index -> segment index for O(1) lookup. However we keep an extra O(no. of `values`) space.
-//        case cacheLookup
+        /// TODO: Store mapping of value index -> segment index for O(1) lookup.?
+        /// However we keep an extra O(no. of `values`) space.
+        /// Also how to keep cache in SwiftUI's View? (w/o resorting to global cache)
+        // case cacheLookup
     }
     
     let values: [Value]
@@ -44,9 +46,6 @@ public struct RHInteractiveLinePlot<StickLabel, Indicator>: View
     @State private var currentlySelectedIndex: Int? = nil
     @State private var currentlySelectedSegmentIndex: Int? = nil
     
-    /// Use when segmentSearchStrategy from `rhPlotConfig` is `cacheLookup`, store mapping of value index -> segment index for O(1) lookup. However we keep twice the `values` data!
-    private var valueIndexToSegmentIndexCache: [Int]?
-    
     @Environment(\.rhLinePlotConfig) var rhPlotConfig
     
     public init(
@@ -71,25 +70,20 @@ public struct RHInteractiveLinePlot<StickLabel, Indicator>: View
         self.showGlowingIndicator = showGlowingIndicator
         self.customLatestValueIndicator = customLatestValueIndicator
         self.segmentSearchStrategy = segmentSearchStrategy
-        
-//        if let segments = lineSegmentStartingIndices, segmentSearchStrategy == .cacheLookup {
-//            self.valueIndexToSegmentIndexCache = buildSegmentLookupCache(segments: segments)
-//            print("Cache Lookup Mode! \(self.valueIndexToSegmentIndexCache?.count)")
-//        }
     }
     
-    private func buildSegmentLookupCache(segments: [Int]) -> [Int] {
-//        guard let segments = lineSegmentStartingIndices else { return nil }
-        var cache = Array<Int>(repeating: -1, count: self.values.count)
-        let allSplitPoints = segments + [self.values.count]
-        let segmentLocations = zip(allSplitPoints, allSplitPoints[1...])
-        for (i, sp) in segmentLocations.enumerated() {
-            // Exclusive `to`
-            let (from, to) = sp
-            cache.replaceSubrange((from..<to), with: repeatElement(i, count: to-from))
-        }
-        return cache
-    }
+    // TODO: How to build this cache *once* for the view?
+//    private func buildIndexToSegmentLookupCache(segments: [Int]) -> [Int] {
+//        var cache = Array<Int>(repeating: -1, count: self.values.count)
+//        let allSplitPoints = segments + [self.values.count]
+//        let segmentLocations = zip(allSplitPoints, allSplitPoints[1...])
+//        for (i, sp) in segmentLocations.enumerated() {
+//            // Exclusive `to`
+//            let (from, to) = sp
+//            cache.replaceSubrange((from..<to), with: repeatElement(i, count: to-from))
+//        }
+//        return cache
+//    }
     
     public var body: some View {
         GeometryReader { proxy in
@@ -113,9 +107,16 @@ public struct RHInteractiveLinePlot<StickLabel, Indicator>: View
     }
     
     func makeGraphBody(proxy: GeometryProxy) -> some View {
-        let GRAPH_WIDTH = proxy.size.width
-        let HALF_WIDTH = GRAPH_WIDTH/2
-        let maxGraphWidth = occupyingRelativeWidth * GRAPH_WIDTH
+        // Full edge-adjusted canvas, used in placing the stick label
+        let canvasFrame = getAdjustedStrokeEdgesCanvasFrame(proxy: proxy, rhLinePlotConfig: self.rhPlotConfig)
+        
+        // Shrinked canvas taking into account the relative width,
+        // used for placing the value stick & dragging
+        let relativeWidthCanvas: CGRect = {
+            var c = canvasFrame
+            c.size.width = occupyingRelativeWidth * canvasFrame.width
+            return c
+        }()
         
         // Currently selected index on screen
         // NOTE: Use 0 if nil for convenience
@@ -125,17 +126,24 @@ public struct RHInteractiveLinePlot<StickLabel, Indicator>: View
         // Get value stick (vertical line that appears on user drag)
         // Compute its offset & text translation
         let valueStickLabel = valueStickLabelBuilder(currentValue)
-        let valueStickOffset = getValueStickOffset(referencedWidth: maxGraphWidth)
-        let valueStickTranslation = valueStickOffset - HALF_WIDTH
+        let valueStickOffset = getValueStickOffset(canvas: relativeWidthCanvas)
+        
+        let canvasWidthWithoutAdjust = proxy.size.width
         
         // Clamp to not go out of plot bounds
         // We need proxy here to calculate the label size dynamically
-        func constrainedStickTranslation(proxy: GeometryProxy) -> CGAffineTransform {
-            let stickLabelWidth = proxy.size.width
-            let translationX = valueStickTranslation.clamp(
-                low: -HALF_WIDTH + stickLabelWidth/2,
-                high: HALF_WIDTH - stickLabelWidth/2)
-            return CGAffineTransform(translationX: translationX, y: 0)
+        func labelTranslation(labelProxy: GeometryProxy) -> CGAffineTransform {
+            // Unlike stick, *without translation, label is centered.
+            //
+            // First we align center of label to the stick:
+            // [LABEL]
+            //    |
+            let centering = -canvasWidthWithoutAdjust/2 + valueStickOffset
+            let labelWidth = labelProxy.size.width
+            let centeringClamped = centering.clamp(
+                low: -canvasWidthWithoutAdjust/2 + labelWidth/2,
+                high: canvasWidthWithoutAdjust/2 - labelWidth/2)
+            return CGAffineTransform(translationX: centeringClamped, y: 0)
         }
         
         return VStack(spacing: rhPlotConfig.gapBetweenPlotAndStickLabel) {
@@ -145,9 +153,9 @@ public struct RHInteractiveLinePlot<StickLabel, Indicator>: View
             // We hide the bottom one and just use it for sizing.
             valueStickLabel.opacity(0)
                 .overlay(
-                    GeometryReader { textProxy in
+                    GeometryReader { labelProxy in
                         valueStickLabel
-                            .transformEffect(constrainedStickTranslation(proxy: textProxy))
+                            .transformEffect(labelTranslation(labelProxy: labelProxy))
                     }.opacity(stickAndLabelOpacity))
             
             // Line Plot
@@ -166,7 +174,7 @@ public struct RHInteractiveLinePlot<StickLabel, Indicator>: View
                     alignment: .leading
             )
                 .contentShape(Rectangle())
-                .gesture(touchAndDrag(maxWidth: maxGraphWidth))
+                .gesture(touchAndDrag(canvas: relativeWidthCanvas))
         }
     }
 }
@@ -202,27 +210,32 @@ public extension RHInteractiveLinePlot where Indicator == GlowingIndicator {
 private extension RHInteractiveLinePlot {
     
     // Get index of nearest data point.
-    func getEffectiveIndex(referencedWidth: CGFloat) -> Int {
-        let relativeX = self.draggableIndicatorOffset / max(referencedWidth, 1)
-        return Int(round(relativeX * CGFloat(self.values.count - 1))).clamp(low: 0, high: self.values.count-1)
+    func getEffectiveIndex(canvas: CGRect) -> Int {
+        let referencedWidth = canvas.width
+        let relativeX = (self.draggableIndicatorOffset - canvas.minX) / max(referencedWidth, 1)
+        return Int(round(relativeX * CGFloat(self.values.count - 1)))
+            .clamp(low: 0, high: self.values.count-1)
     }
     
     // Get final offset for line that snaps to the nearest data point.
-    func getValueStickOffset(referencedWidth: CGFloat) -> CGFloat {
-        let targetIndex = CGFloat(getEffectiveIndex(referencedWidth: referencedWidth))
+    func getValueStickOffset(canvas: CGRect) -> CGFloat {
+        let targetIndex = CGFloat(getEffectiveIndex(canvas: canvas))
+        
+        let referencedWidth = canvas.width
         let segmentLength = referencedWidth / CGFloat(values.count - 1)
         let target = targetIndex * segmentLength
-        return target.clamp(low: 0, high: referencedWidth)
+        return canvas.minX + target.clamp(low: 0, high: referencedWidth)
     }
     
-    func touchAndDrag(maxWidth: CGFloat) -> some Gesture {
+    func touchAndDrag(canvas: CGRect) -> some Gesture {
         let drag = DragGesture(minimumDistance: 0)
             .updating($isDragging) { (value, state, _) in
                 state = true
         }.onChanged { (value) in
-            self.draggableIndicatorOffset = min(value.location.x, maxWidth)
+            self.draggableIndicatorOffset = value.location.x
+                .clamp(low: canvas.minX, high: canvas.maxX)
             
-            self.currentlySelectedIndex = self.getEffectiveIndex(referencedWidth: maxWidth)
+            self.currentlySelectedIndex = self.getEffectiveIndex(canvas: canvas)
             self.didSelectValueAtIndex?(self.currentlySelectedIndex)
             
             let activeSegment: Int?
@@ -232,9 +245,6 @@ private extension RHInteractiveLinePlot {
                 switch self.segmentSearchStrategy {
                 case .binarySearch:
                     activeSegment = binarySearchOrIndexToTheLeft(array: segments, value: currentIndex)
-//                case .cacheLookup:
-//                    assert(self.valueIndexToSegmentIndexCache != nil, "Expect cache to be already built")
-//                    activeSegment = self.valueIndexToSegmentIndexCache![currentIndex]
                 }
             } else {
                 activeSegment = nil
@@ -245,7 +255,7 @@ private extension RHInteractiveLinePlot {
             }
         }
         .onEnded { (_) in
-            self.draggableIndicatorOffset = maxWidth
+            self.draggableIndicatorOffset = canvas.maxX
             
             self.currentlySelectedIndex = nil
             self.didSelectValueAtIndex?(nil)

@@ -11,8 +11,8 @@ import SwiftUI
 extension RHLinePlot {
     
     func drawPlotWithSegmentedLines(canvasFrame: CGRect, lineSegmentStartingIndices: [Int]) -> some View {
-        let WIDTH = canvasFrame.size.width * occupyingRelativeWidth
-        let HEIGHT = canvasFrame.size.height
+        let WIDTH = canvasFrame.width * occupyingRelativeWidth
+        let HEIGHT = canvasFrame.height
         
         let lineSectionLength = (WIDTH/CGFloat(values.count - 1))
         
@@ -36,16 +36,25 @@ extension RHLinePlot {
             
             // If all values equal, simply draw a straight line in the middle
             if allValuesAreEqual {
-                path.move(to: CGPoint(x: currentX, y: HEIGHT * (1 - self.rhLinePlotConfig.relativeYForStraightLine)))
+                path.move(to:
+                    CGPoint(
+                        x: canvasFrame.minX + currentX,
+                        y: canvasFrame.minY + HEIGHT * (1 - self.rhLinePlotConfig.relativeYForStraightLine)))
+                
                 currentX += lineSectionLength * CGFloat(segmentValues.count)
-                path.addLine(to: CGPoint(x: currentX, y: HEIGHT/2))
+                
+                path.addLine(to:
+                    CGPoint(
+                        x: canvasFrame.minX + currentX,
+                        y: canvasFrame.minY + HEIGHT/2))
                 return
             }
             
             assert(inverseValueHeightDifference != nil)
             var currentY = (1 - inverseValueHeightDifference! * previousYPosition) * HEIGHT
             
-            path.move(to: CGPoint(x: canvasFrame.origin.x + currentX, y: canvasFrame.origin.y + currentY))
+            path.move(to: CGPoint(x: canvasFrame.minX + currentX,
+                                  y: canvasFrame.minY + currentY))
             
             // Draw segments of (currentX, nextX)
             for v in segmentValues {
@@ -53,9 +62,9 @@ extension RHLinePlot {
                 let nextY = (1 - inverseValueHeightDifference! * CGFloat(v - lowest)) * HEIGHT
                 if currentX < 0 {
                     // *Handle when previousIndex is -1,  currentX will be negative. We won't addLine here yet, just move.
-                    path.move(to: CGPoint(x: canvasFrame.origin.x + nextX, y: canvasFrame.origin.y + nextY))
+                    path.move(to: CGPoint(x: canvasFrame.minX + nextX, y: canvasFrame.minY + nextY))
                 } else {
-                    path.addLine(to: CGPoint(x: canvasFrame.origin.x + nextX, y: canvasFrame.origin.y + nextY))
+                    path.addLine(to: CGPoint(x: canvasFrame.minX + nextX, y: canvasFrame.minY + nextY))
                 }
                 currentX = nextX
                 currentY = nextY
@@ -94,5 +103,4 @@ extension RHLinePlot {
             )
         }
     }
-
 }

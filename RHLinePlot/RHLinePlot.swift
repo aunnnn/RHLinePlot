@@ -96,7 +96,7 @@ public struct RHLinePlot<Indicator: View>: View {
     public var body: some View {
         GeometryReader { (proxy: GeometryProxy) in
             // Bug? if I do `let canvasFrame ...` here and return view, compiler isn't happy.
-            bindView(data: self.getFinalCanvasFrame(proxy: proxy)) { (canvasFrame) in
+            bindView(data: getAdjustedStrokeEdgesCanvasFrame(proxy: proxy, rhLinePlotConfig: self.rhLinePlotConfig)) { (canvasFrame) in
                 ZStack(alignment: .topLeading) {
                     self.plotBody(canvasFrame: canvasFrame)
                     if self.showGlowingIndicator {
@@ -105,30 +105,6 @@ public struct RHLinePlot<Indicator: View>: View {
                 }
             }
         }
-    }
-    
-    func getFinalCanvasFrame(proxy: GeometryProxy) -> CGRect {
-        // ***Fix unintended blur clipping from using `.drawingGroup()` on laser mode.
-        // The solution here is to shrink the canvas.
-        // ----------------------------------------------------------------------------------
-        // When we use `drawingGroup()` the blurring part that extends beyond the path frame
-        // seems to be clipped off.
-        //
-        // (Probably the cache image doesn't consider out of bounds
-        // since it's needed to be composed unopaquely with layers below.)
-        let canvasFrame: CGRect
-        if rhLinePlotConfig.useLaserLightLinePlotStyle {
-            let lineWidth = rhLinePlotConfig.plotLineWidth
-            // Since biggest laser stroke & blur is L = 3 x lineWidth.
-            // We estimate the width of extension part (on each side)
-            // by using half of L stroke, and full blur radius of L.
-            // 0.5*L + 1*L = 4.5*L
-            let adjustedEachBorderDueToBlur: CGFloat = 4.5 * lineWidth
-            canvasFrame = CGRect(x: 0, y: adjustedEachBorderDueToBlur, width: proxy.size.width, height: proxy.size.height - 2*adjustedEachBorderDueToBlur)
-        } else {
-            canvasFrame = CGRect(x: 0, y: 0, width: proxy.size.width, height: proxy.size.height)
-        }
-        return canvasFrame
     }
 }
 
@@ -161,10 +137,10 @@ private func bindView<D, V: View>(data: D, transform: (D) -> V) -> V {
 extension RHLinePlot {
     
     func getGlowingIndicatorLocation(canvasFrame: CGRect) -> CGSize {
-        let HEIGHT = canvasFrame.size.height
+        let HEIGHT = canvasFrame.height
         let (highest, lowest) = findHighestAndLowest(values: values)
         
-        let x: CGFloat = occupyingRelativeWidth * canvasFrame.size.width
+        let x: CGFloat = occupyingRelativeWidth * canvasFrame.width
         
         // If all values are equal, display at the middle
         if highest == lowest {
@@ -174,7 +150,7 @@ extension RHLinePlot {
         let relativeY = CGFloat(values.last! - lowest) / CGFloat(highest - lowest)
         let y = (1 - relativeY) * HEIGHT
         
-        return CGSize(width: canvasFrame.origin.x + x, height: canvasFrame.origin.y + y)
+        return CGSize(width: canvasFrame.minX + x, height: canvasFrame.minY + y)
     }
     
     func getOpacity(forSegment segment: Int) -> Double {
@@ -183,6 +159,61 @@ extension RHLinePlot {
             return 1.0
         }
         return activeSegment == segment ? 1.0 : self.rhLinePlotConfig.opacityOfUnselectedSegment
+    }
+}
+
+func getAdjustedStrokeEdgesCanvasFrame(proxy: GeometryProxy, rhLinePlotConfig: RHLinePlotConfig) -> CGRect {
+    // ***Fix unintended blur clipping from using `.drawingGroup()` on laser mode.
+    // The solution here is to shrink the canvas height.
+    // ----------------------------------------------------------------------------------
+    // When we use `drawingGroup()` the blurring part that extends beyond the path frame
+    // seems to be clipped off.
+    //
+    // (Probably the cache image doesn't consider out of bounds
+    // since it's needed to be composed unopaquely with layers below.)
+    
+    // If laser mode, always adjusts
+    if rhLinePlotConfig.useLaserLightLinePlotStyle {
+        let lineWidth = rhLinePlotConfig.plotLineWidth
+        // magic number here...
+        // L = 3*lineWidth (biggest laser stroke)
+        // stroke = 0.5*L
+        // blur radius = 2*R = 2*L
+        // 2.5*L = 7.5*lineWidth is the safest. But we stick with 7 here.
+        let adjustedEachBorderDueToBlur: CGFloat = 7 * lineWidth
+        return CGRect(
+            x: adjustedEachBorderDueToBlur,
+            y: adjustedEachBorderDueToBlur,
+            width: proxy.size.width - 2*adjustedEachBorderDueToBlur,
+            height: proxy.size.height - 2*adjustedEachBorderDueToBlur)
+    } else {
+        let adjustedEdges = rhLinePlotConfig.adjustedEdgesToFitLineStrokeInCanvas
+        if !adjustedEdges.isEmpty {
+            var x: CGFloat = 0
+            var y: CGFloat = 0
+            var width: CGFloat = proxy.size.width
+            var height: CGFloat = proxy.size.height
+            
+            let adjustedValue = rhLinePlotConfig.plotLineWidth/2
+            if adjustedEdges.contains(.top) {
+                y += adjustedValue
+                height -= adjustedValue
+            }
+            if adjustedEdges.contains(.bottom) {
+                height -= adjustedValue
+            }
+            if adjustedEdges.contains(.leading) {
+                x += adjustedValue
+                width -= adjustedValue
+            }
+            if adjustedEdges.contains(.trailing) {
+                width -= adjustedValue
+            }
+            return CGRect(x: x, y: y, width: width, height: height)
+        } else {
+            // No adjustment
+            return CGRect(x: 0, y: 0, width: proxy.size.width, height: proxy.size.height)
+        }
     }
 }
 

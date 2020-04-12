@@ -22,7 +22,7 @@ struct BasicUsagePage: View {
     
     var body: some View {
         List {
-            
+            Text("By default will use `foregroundColor` for line color")
             VStack {
                 Text("Unsegmented")
                 RHLinePlot(
