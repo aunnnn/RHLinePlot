@@ -30,7 +30,9 @@ RHLinePlot(
 )
 ```
 
-`segments` is the beginning indices of each segment. I.e. `values = [1,2,3,4,3,2,1,2,3,4]` and `segments = [0,4,8]` means there are three segments in this line plot: 0-3, 4-7, 8-9.
+Notes:
+- `segments` is the beginning indices of each segment. I.e. `values = [1,2,3,4,3,2,1,2,3,4]` and `segments = [0,4,8]` means there are three segments in this line plot: 0-3, 4-7, 8-9.
+- `occupyingRelativeWidth = 0.8` is to plot 80% of the plot canvas. This is useful to simulate realtime data. I.e. compute the current hour of the day relative to the 24-hour timeframe and use that ratio. By default this is 1.0.
 
 ### With interactive elements
 ```swift
