@@ -10,7 +10,9 @@ Demo:
 - Highlight active segment
 - Laser mode!
 
-Play around with the example app to see possible customizations and the Robinhood-style view shown in the demo. The moving price effect label in that page would be worthy of another repo.
+Play around with the example app to see possible customizations and the Robinhood-style view shown in the demo. 
+
+The **moving price effect** in that page would be worthy of another repo [here](https://github.com/aunnnn/MovingNumbersView).
 
 ## Installation
 Just use the source however you like. The library is in folder `RHLinePlot`.
