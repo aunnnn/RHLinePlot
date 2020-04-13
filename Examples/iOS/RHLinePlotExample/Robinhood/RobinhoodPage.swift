@@ -131,7 +131,7 @@ struct RobinhoodPage: View {
     }
     
     var body: some View {
-        Group {
+        VStack {
             if viewModel.isLoading || currentPlotData == nil {
                 Text("Loading...")
             } else {

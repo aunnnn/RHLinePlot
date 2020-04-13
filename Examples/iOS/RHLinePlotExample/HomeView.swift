@@ -19,7 +19,7 @@ struct HomeView: View {
     }
     
     var robinhoodPage: some View {
-        RobinhoodPage(isLaserModeOn: isLaserModeOn)
+        RobinhoodPage()
     }
     
     @State var isDarkMode: Bool = false
