@@ -1,5 +1,5 @@
 # RHLinePlot
-Line plot like in Robinhood app
+Line plot like in Robinhood app, in pure SwiftUI
 
 Demo:
 
