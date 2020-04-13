@@ -5,7 +5,7 @@ Demo:
 
 ![Demo](https://raw.githubusercontent.com/aunnnn/RHLinePlot/master/rhplot-demo-new.gif)
 
-Looking for how to do the **moving price label effect**? [Another repo here.](https://github.com/aunnnn/MovingNumbersView).
+*Looking for how to do the **moving price label effect**? [Another repo here.](https://github.com/aunnnn/MovingNumbersView)*
 
 ## Features
 - Support glowing indicator, i.e. for real-time data
