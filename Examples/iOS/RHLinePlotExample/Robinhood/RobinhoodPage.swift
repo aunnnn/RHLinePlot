@@ -186,7 +186,7 @@ extension RobinhoodPage {
         return HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text("\(Self.symbol)")
-                    .rhFont(style: .title1, weight: .bold)
+                    .rhFont(style: .title1, weight: .heavy)
                 buildMovingPriceLabel(plotData: plotData)
             }
             Spacer()
@@ -202,10 +202,11 @@ extension RobinhoodPage {
                 number: Double(plotData[currentIndex].price),
                 numberOfDecimalPlaces: 2,
                 verticalDigitSpacing: 0,
-                animationDuration: 0.25,
+                animationDuration: 0.3,
                 fixedWidth: 100) { (digit) in
                     Text(digit)
-            }.mask(LinearGradient(
+            }
+            .mask(LinearGradient(
                 gradient: Gradient(stops: [
                     Gradient.Stop(color: .clear, location: 0),
                     Gradient.Stop(color: .black, location: 0.2),
@@ -214,7 +215,7 @@ extension RobinhoodPage {
                 startPoint: .top,
                 endPoint: .bottom))
         }
-        .rhFont(style: .title1, weight: .bold)
+        .rhFont(style: .title1, weight: .heavy)
     }
 }
 

@@ -20,6 +20,7 @@ class RobinhoodPageViewModel: ObservableObject {
     @Published var weeklyPlotData: PlotData?
     @Published var monthlyPlotData: PlotData?
     
+    // For displaying segments 
     var segmentsDataCache: [TimeDisplayOption: [Int]] = [:]
     
     let symbol: String

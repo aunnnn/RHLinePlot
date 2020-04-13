@@ -77,7 +77,7 @@ extension MovingNumbersView {
             .modifier(VerticalShift(
                 diffNumber: digit,
                 digitSpacing: verticalDigitSpacing))
-            .drawingGroup()
+//            .drawingGroup()
         return ds
     }
     
