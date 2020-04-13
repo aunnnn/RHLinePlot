@@ -7,6 +7,8 @@ Demo:
 
 *Looking for how to do the **moving price label effect**? [Another repo here.](https://github.com/aunnnn/MovingNumbersView)*
 
+Demo stock API is from [Alphavantage](https://www.alphavantage.co).
+
 ## Features
 - Support glowing indicator, i.e. for real-time data
 - Highlight active segment
