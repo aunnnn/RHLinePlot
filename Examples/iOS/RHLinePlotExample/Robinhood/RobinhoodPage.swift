@@ -64,14 +64,70 @@ struct RobinhoodPage: View {
     
     // MARK: Body
     func readyPageContent(plotData: PlotData) -> some View {
-        VStack {
+        ScrollView {
             stockHeaderAndPrice(plotData: plotData)
             plotBody(plotData: plotData)
             TimeDisplayModeSelector(
                 currentTimeDisplayOption: $timeDisplayMode,
                 eligibleModes: TimeDisplayOption.allCases)
+            
+            Divider()
+            HStack {
+                Text("All Segments")
+                    .bold()
+                    .rhFont(style: .title2)
+                Spacer()
+            }.padding([.leading, .top], 22)
+            rowsOfSegment(plotData)
             Spacer()
         }
+    }
+    
+    func rowsOfSegment(_ plotData: PlotData) -> some View {
+        guard let segments = viewModel.segmentsDataCache[timeDisplayMode] else {
+            return AnyView(EmptyView())
+        }
+        let allSplitPoints = segments + [plotData.count]
+        let fromAndTos = Array(zip(allSplitPoints, allSplitPoints[1...]))
+        let allTimes = plotData.map { $0.time }
+        let allValues = plotData.map { $0.price }
+        let dateFormatter = timeDisplayMode == .hourly ?
+            SharedDateFormatter.onlyTime : SharedDateFormatter.dayAndYear
+        return AnyView(ForEach((0..<fromAndTos.count).reversed(), id: \.self) { (i) -> AnyView in
+            let (from, to) = fromAndTos[i]
+            let endingPrice = allValues[to-1]
+            let firstPrice = allValues[from]
+            let endingTime = allTimes[to-1]
+            let color = endingPrice >= firstPrice ? rhThemeColor : rhRedThemeColor
+            return AnyView(self.segmentRow(
+                titleText: "\(dateFormatter.string(from: endingTime))",
+                values: Array(allValues[from..<to]),
+                priceText: "$\(endingPrice.round2Str())").accentColor(color)
+            )
+            }.drawingGroup())
+    }
+    func segmentRow(titleText: String, values: [CGFloat], priceText: String) -> some View {
+        HStack {
+            Text(titleText)
+                .rhFont(style: .headline)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.leading, 22)
+            RHLinePlot(values: values)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .foregroundColor(Color.accentColor)
+            
+            Text(priceText)
+                .rhFont(style: .headline)
+                .foregroundColor(.white)
+                .padding(.vertical, 4)
+                .padding(.horizontal, 8)
+                .background(
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(Color.accentColor))
+                .frame(maxWidth: .infinity, alignment: .trailing)
+                .padding(.trailing, 22)
+        }.frame(height: 60)
     }
     
     var body: some View {
@@ -102,10 +158,12 @@ extension RobinhoodPage {
         let dateString = timeDisplayMode.dateFormatter()
             .string(from: plotData[currentIndex].time)
         
+        let themeColor = values.last! >= values.first! ? rhThemeColor : rhRedThemeColor
+        
         return RHInteractiveLinePlot(
             values: values,
-            occupyingRelativeWidth: 0.7,
-            showGlowingIndicator: true,
+            occupyingRelativeWidth: plotRelativeWidth,
+            showGlowingIndicator: showGlowingIndicator,
             lineSegmentStartingIndices: plotDataSegments,
             segmentSearchStrategy: .binarySearch,
             didSelectValueAtIndex: { ind in
@@ -121,21 +179,42 @@ extension RobinhoodPage {
                     .foregroundColor(.gray)
         })
             .frame(height: 280)
-            .foregroundColor(rhThemeColor)
+            .foregroundColor(themeColor)
     }
     
     func stockHeaderAndPrice(plotData: PlotData) -> some View {
-        let currentIndex = self.currentIndex ?? (plotData.count - 1)
         return HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text("\(Self.symbol)")
                     .rhFont(style: .title1, weight: .bold)
-                Text("$\(plotData[currentIndex].price.round2Str())")
-                    .rhFont(style: .title1, weight: .bold)
+                buildMovingPriceLabel(plotData: plotData)
             }
             Spacer()
         }
         .padding(.horizontal, 16)
+    }
+    
+    func buildMovingPriceLabel(plotData: PlotData) -> some View {
+        let currentIndex = self.currentIndex ?? (plotData.count - 1)
+        return HStack(spacing: 2) {
+            Text("$")
+            MovingNumbersView(
+                number: Double(plotData[currentIndex].price),
+                numberOfDecimalPlaces: 2,
+                verticalDigitSpacing: 0,
+                animationDuration: 0.25,
+                fixedWidth: 100) { (digit) in
+                    Text(digit)
+            }.mask(LinearGradient(
+                gradient: Gradient(stops: [
+                    Gradient.Stop(color: .clear, location: 0),
+                    Gradient.Stop(color: .black, location: 0.2),
+                    Gradient.Stop(color: .black, location: 0.8),
+                    Gradient.Stop(color: .clear, location: 1.0)]),
+                startPoint: .top,
+                endPoint: .bottom))
+        }
+        .rhFont(style: .title1, weight: .bold)
     }
 }
 

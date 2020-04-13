@@ -10,6 +10,7 @@ import SwiftUI
 
 private let rhFontName = "HelveticaNeue"
 let rhThemeColor = Color(red: 33/255, green: 206/255, blue: 153/255)
+let rhRedThemeColor = Color(red: 244/255, green: 85/255, blue: 49/255)
 
 struct CustomFont: ViewModifier {
     @Environment(\.sizeCategory) var sizeCategory

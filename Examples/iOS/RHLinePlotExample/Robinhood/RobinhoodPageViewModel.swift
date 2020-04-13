@@ -20,6 +20,8 @@ class RobinhoodPageViewModel: ObservableObject {
     @Published var weeklyPlotData: PlotData?
     @Published var monthlyPlotData: PlotData?
     
+    var segmentsDataCache: [TimeDisplayOption: [Int]] = [:]
+    
     let symbol: String
     
     private var storage = Set<AnyCancellable>()
@@ -31,18 +33,6 @@ class RobinhoodPageViewModel: ObservableObject {
         StocksAPI.networkActivity
             .receive(on: RunLoop.main)
             .assign(to: \.isLoading, on: self)
-            .store(in: &storage)
-        
-        logic.$dailyResponse
-            .compactMap(mapToPlotData)
-            .receive(on: RunLoop.main)
-            .assign(to: \.dailyPlotData, on: self)
-            .store(in: &storage)
-        
-        logic.$intradayResponse
-            .compactMap(mapToPlotData)
-            .receive(on: RunLoop.main)
-            .assign(to: \.intradayPlotData, on: self)
             .store(in: &storage)
         
         let publishers = [
@@ -59,13 +49,32 @@ class RobinhoodPageViewModel: ObservableObject {
             \.monthlyPlotData
         ]
         
-        zip(publishers, assignees)
-            .forEach { (tup) in
+        let timeDisplayOptions: [TimeDisplayOption] = [.hourly, .daily, .weekly, .monthly]
+
+        zip(publishers, assignees).enumerated()
+            .forEach { (i, tup) in
                 let (publisher, assignee) = tup
+                
+                let displayOption = timeDisplayOptions[i]
+                
                 publisher
                     .compactMap(mapToPlotData)
                     .receive(on: RunLoop.main)
-                    .assign(to: assignee, on: self)
+                    .sink(receiveValue: { (plotData) in
+                        self[keyPath: assignee] = plotData
+                        
+                        // Cache segments
+                        let segments: [Int]
+                        switch displayOption {
+                        case .hourly:
+                            segments = Self.segmentByHours(values: plotData)
+                        case .daily:
+                            segments = Self.segmentByMonths(values: plotData)
+                        case .weekly, .monthly:
+                            segments = Self.segmentByYears(values: plotData)
+                        }
+                        self.segmentsDataCache[displayOption] = segments
+                    })
                     .store(in: &storage)
         }
     }
