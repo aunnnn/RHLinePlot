@@ -3,7 +3,7 @@ Line plot like in Robinhood app, in pure SwiftUI
 
 Demo:
 
-![Demo](https://raw.githubusercontent.com/aunnnn/RHLinePlot/master/rhplot-demo.gif)
+![Demo](https://raw.githubusercontent.com/aunnnn/RHLinePlot/master/rhplot-demo-new.gif)
 
 ## Features
 - Support glowing indicator, i.e. for real-time data
