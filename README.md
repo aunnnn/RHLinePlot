@@ -10,8 +10,9 @@ Demo:
 Demo stock API is from [Alphavantage](https://www.alphavantage.co).
 
 ## Features
+- Support drag interaction, highlight active segment
 - Support glowing indicator, i.e. for real-time data
-- Highlight active segment
+- Customize animation duration, glowing size, labels etc.
 - Laser mode!
 
 Play around with the example app to see possible customizations and the Robinhood-style view shown in the demo.
