@@ -120,8 +120,15 @@ public struct RHLinePlotConfig {
     /// Padding from the lowest point of line plot to value stick. If `0`, the end of value stick will be at the same level of the lowest point in plot.
     public var valueStickBottomPadding: CGFloat = 28
     
-    
     public var spaceBetweenValueStickAndStickLabel: CGFloat = 8
+
+    /// Duration of long press before the value stick is activated and draggable.
+    ///
+    /// The more it is, the less likely the interactive part is activated accidentally on scroll view. Default is `0.1`.
+    ///
+    /// There's some lower-bound on this value that I guess coming from delaysContentTouches of
+    /// the ScrollView. So long press of 0 won't 
+    public var minimumPressDurationToActivateInteraction: Double = 0.1
     
     public static let `default` = RHLinePlotConfig()
     
