@@ -18,6 +18,7 @@
 		30C49ED1243F1E98005D2B54 /* RHLinePlot+Segmented.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C49ED0243F1E98005D2B54 /* RHLinePlot+Segmented.swift */; };
 		30C49ED3243F1EDB005D2B54 /* RHLinePlotConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C49ED2243F1EDB005D2B54 /* RHLinePlotConfig.swift */; };
 		30C49ED5243F202E005D2B54 /* RHLinePlot+NotSegmented.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C49ED4243F202E005D2B54 /* RHLinePlot+NotSegmented.swift */; };
+		30DA1F8E244B02D2001BEEB6 /* PressAndHorizontalDragGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30DA1F8D244B02D2001BEEB6 /* PressAndHorizontalDragGesture.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,6 +47,7 @@
 		30C49ED0243F1E98005D2B54 /* RHLinePlot+Segmented.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RHLinePlot+Segmented.swift"; sourceTree = "<group>"; };
 		30C49ED2243F1EDB005D2B54 /* RHLinePlotConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RHLinePlotConfig.swift; sourceTree = "<group>"; };
 		30C49ED4243F202E005D2B54 /* RHLinePlot+NotSegmented.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RHLinePlot+NotSegmented.swift"; sourceTree = "<group>"; };
+		30DA1F8D244B02D2001BEEB6 /* PressAndHorizontalDragGesture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PressAndHorizontalDragGesture.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -115,6 +117,7 @@
 				30C49ECC243F0E98005D2B54 /* GlowingIndicator.swift */,
 				301D180C243FD57C00032B96 /* LinePlotValueStick.swift */,
 				30C49ECE243F16CA005D2B54 /* Misc.swift */,
+				30DA1F8D244B02D2001BEEB6 /* PressAndHorizontalDragGesture.swift */,
 			);
 			path = RHLinePlot;
 			sourceTree = "<group>";
@@ -243,6 +246,7 @@
 				30C49ECB243F0E62005D2B54 /* RHLinePlot.swift in Sources */,
 				301D180A243F2D9800032B96 /* RHInteractiveLinePlot.swift in Sources */,
 				30C49ED3243F1EDB005D2B54 /* RHLinePlotConfig.swift in Sources */,
+				30DA1F8E244B02D2001BEEB6 /* PressAndHorizontalDragGesture.swift in Sources */,
 				301D180D243FD57C00032B96 /* LinePlotValueStick.swift in Sources */,
 				30C49ECD243F0E98005D2B54 /* GlowingIndicator.swift in Sources */,
 				30C49ED5243F202E005D2B54 /* RHLinePlot+NotSegmented.swift in Sources */,
