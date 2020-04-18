@@ -34,11 +34,18 @@ public struct PressAndHorizontalDragGestureView: UIViewRepresentable {
 
         public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
             // Only on horizontal drag
-            if gestureRecognizer == self.pan {
+            if gestureRecognizer == pan {
+                // Long pressed already, allow any direction
+                if isDraggingActivated {
+                    return true
+                }
                 let v = pan.velocity(in: pan.view!)
                 return abs(v.x) > abs(v.y)
-            } else {
+            } else if gestureRecognizer == longPress {
+                isDraggingActivated = true
                 return true
+            } else {
+                fatalError("Unknown gesture recognizer")
             }
         }
         

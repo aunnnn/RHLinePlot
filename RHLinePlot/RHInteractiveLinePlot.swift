@@ -228,6 +228,7 @@ private extension RHInteractiveLinePlot {
         return canvas.minX + target.clamp(low: 0, high: referencedWidth)
     }
     
+// Just in case we come back to here.
 //    func touchAndDrag(canvas: CGRect) -> some Gesture {
 //        let drag = DragGesture(minimumDistance: 0)
 //            .updating($isDragging) { (value, state, _) in
@@ -269,10 +270,11 @@ private extension RHInteractiveLinePlot {
 //        return drag
 //    }
     
+    /// A proxy view to handle gestures.
     func pressAndDragProxyView(canvas: CGRect) -> some View {
+        let minimumPressDuration = rhPlotConfig.minimumPressDurationToActivateInteraction
         return PressAndHorizontalDragGestureView(
-            // seems like there's a lower bound to this value
-            minimumPressDuration: 0.05,
+            minimumPressDuration: minimumPressDuration,
             onBegan: { (value) in
                 self.isDragging = true
                 self.onStickLocationChanged(newX: value.location.x, canvas: canvas)
