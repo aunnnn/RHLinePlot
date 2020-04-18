@@ -173,9 +173,9 @@ public struct RHInteractiveLinePlot<StickLabel, Indicator>: View
                         .foregroundColor(rhPlotConfig.valueStickColor),
                     alignment: .leading
             )
-                .background(pressAndDragProxyView(canvas: relativeWidthCanvas))
                 .contentShape(Rectangle())
 //                .gesture(touchAndDrag(canvas: relativeWidthCanvas))
+            .overlay(pressAndDragProxyView(canvas: relativeWidthCanvas))
         }
     }
 }
