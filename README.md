@@ -3,14 +3,19 @@ Line plot like in Robinhood app, in pure SwiftUI
 
 Demo:
 
-![Demo](https://raw.githubusercontent.com/aunnnn/RHLinePlot/master/rhplot-demo.gif)
+![Demo](https://raw.githubusercontent.com/aunnnn/RHLinePlot/master/rhplot-demo-new.gif)
+
+*Looking for how to do the **moving price label effect**? [Another repo here.](https://github.com/aunnnn/MovingNumbersView)*
+
+Demo stock API is from [Alphavantage](https://www.alphavantage.co).
 
 ## Features
+- Support drag interaction, highlight active segment
 - Support glowing indicator, i.e. for real-time data
-- Highlight active segment
+- Customize animation duration, glowing size, labels etc.
 - Laser mode!
 
-Play around with the example app to see possible customizations and the Robinhood-style view shown in the demo. The moving price effect label in that page would be worthy of another repo.
+Play around with the example app to see possible customizations and the Robinhood-style view shown in the demo.
 
 ## Installation
 Just use the source however you like. The library is in folder `RHLinePlot`.
