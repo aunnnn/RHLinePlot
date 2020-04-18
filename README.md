@@ -127,7 +127,7 @@ public struct RHLinePlotConfig {
     /// The more it is, the less likely the interactive part is activated accidentally on scroll view. Default is `0.1`.
     ///
     /// There's some lower-bound on this value that I guess coming from delaysContentTouches of
-    /// the ScrollView. So long press of 0 won't 
+    /// the ScrollView. So if this is `0`, iit won't immediately activate the long press (but quickly horizontal pan will).
     public var minimumPressDurationToActivateInteraction: Double = 0.1
     
     public static let `default` = RHLinePlotConfig()
