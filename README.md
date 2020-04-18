@@ -1,7 +1,7 @@
 # RHLinePlot
 Line plot like in Robinhood app, in pure SwiftUI
 
-Demo:
+Demo (higher-res on [Reddit](https://www.reddit.com/r/SwiftUI/comments/g0hcct/rhlineplot_demo_a_robinhoodlike_line_plot_in/))
 
 ![Demo](https://raw.githubusercontent.com/aunnnn/RHLinePlot/master/rhplot-demo-new.gif)
 
@@ -133,4 +133,4 @@ public struct RHLinePlotConfig {
 }
 ```
 ## TODO
-- Dragging in the interactive plot consumes all the gestures. If you put it in a `ScrollView`, you can't scroll the scroll view in the interactive plot area, you'd be interacting with the plot instead.
+- ~Dragging in the interactive plot consumes all the gestures. If you put it in a `ScrollView`, you can't scroll the scroll view in the interactive plot area, you'd be interacting with the plot instead.~ - Fixed by using a clear [proxy view](https://github.com/aunnnn/RHLinePlot/blob/master/RHLinePlot/PressAndHorizontalDragGesture.swift) to handle gestures
