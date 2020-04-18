@@ -133,4 +133,4 @@ public struct RHLinePlotConfig {
 }
 ```
 ## TODO
-- -Dragging in the interactive plot consumes all the gestures. If you put it in a `ScrollView`, you can't scroll the scroll view in the interactive plot area, you'd be interacting with the plot instead.-
+- ~Dragging in the interactive plot consumes all the gestures. If you put it in a `ScrollView`, you can't scroll the scroll view in the interactive plot area, you'd be interacting with the plot instead.~ - Fixed by using a clear [proxy view](https://github.com/aunnnn/RHLinePlot/blob/master/RHLinePlot/PressAndHorizontalDragGesture.swift) to handle gestures
