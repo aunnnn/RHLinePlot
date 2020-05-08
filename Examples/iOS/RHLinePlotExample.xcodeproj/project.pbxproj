@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		303F60072442995E00DB8D0E /* RobinhoodPageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 303F60062442995E00DB8D0E /* RobinhoodPageViewModel.swift */; };
-		30622AB224446C120082C51A /* MovingNumbersView+Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30622AB024446C120082C51A /* MovingNumbersView+Components.swift */; };
 		30622AB324446C120082C51A /* MovingNumbersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30622AB124446C120082C51A /* MovingNumbersView.swift */; };
 		3093819A2441281C00028E71 /* StocksAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309381992441281C00028E71 /* StocksAPI.swift */; };
 		30A908A524403F6D0094A1FC /* RHLinePlot.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 301D1805243F2BF700032B96 /* RHLinePlot.framework */; };
@@ -47,7 +46,6 @@
 /* Begin PBXFileReference section */
 		301D1805243F2BF700032B96 /* RHLinePlot.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RHLinePlot.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		303F60062442995E00DB8D0E /* RobinhoodPageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RobinhoodPageViewModel.swift; sourceTree = "<group>"; };
-		30622AB024446C120082C51A /* MovingNumbersView+Components.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "MovingNumbersView+Components.swift"; sourceTree = "<group>"; };
 		30622AB124446C120082C51A /* MovingNumbersView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovingNumbersView.swift; sourceTree = "<group>"; };
 		309381992441281C00028E71 /* StocksAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StocksAPI.swift; sourceTree = "<group>"; };
 		30A908AC244045E90094A1FC /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -93,7 +91,6 @@
 			isa = PBXGroup;
 			children = (
 				30622AB124446C120082C51A /* MovingNumbersView.swift */,
-				30622AB024446C120082C51A /* MovingNumbersView+Components.swift */,
 			);
 			path = MovingNumber;
 			sourceTree = "<group>";
@@ -231,7 +228,6 @@
 			files = (
 				30F9AED12441AA8800E5BCEB /* RobinhoodPageBusinessLogic.swift in Sources */,
 				30CACE18243F22A000C8669F /* AppDelegate.swift in Sources */,
-				30622AB224446C120082C51A /* MovingNumbersView+Components.swift in Sources */,
 				30A908AD244045E90094A1FC /* HomeView.swift in Sources */,
 				30CACE1A243F22A000C8669F /* SceneDelegate.swift in Sources */,
 				30F9AEC724418C2200E5BCEB /* Misc.swift in Sources */,
