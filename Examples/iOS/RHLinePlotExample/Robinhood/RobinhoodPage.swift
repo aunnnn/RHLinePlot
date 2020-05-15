@@ -64,12 +64,16 @@ struct RobinhoodPage: View {
     
     // MARK: Body
     func readyPageContent(plotData: PlotData) -> some View {
-        ScrollView {
+        let firstPrice = plotData.first?.price ?? 0
+        let lastPrice = plotData.last?.price ?? 0
+        let themeColor = firstPrice <= lastPrice ? rhThemeColor : rhRedThemeColor
+        return ScrollView {
             stockHeaderAndPrice(plotData: plotData)
             plotBody(plotData: plotData)
             TimeDisplayModeSelector(
                 currentTimeDisplayOption: $timeDisplayMode,
-                eligibleModes: TimeDisplayOption.allCases)
+                eligibleModes: TimeDisplayOption.allCases
+            ).accentColor(themeColor)
             
             Divider()
             HStack {
