@@ -1,15 +1,13 @@
 # RHLinePlot
-Line plot like in Robinhood app, in pure SwiftUI
+Line plot like in Robinhood app, in SwiftUI
 
-Demo (higher-res on [Reddit](https://www.reddit.com/r/SwiftUI/comments/g0hcct/rhlineplot_demo_a_robinhoodlike_line_plot_in/))
-
-![Demo](https://raw.githubusercontent.com/aunnnn/RHLinePlot/master/rhplot-demo-new.gif)
+![Demo](https://raw.githubusercontent.com/aunnnn/RHLinePlot/master/rhlineplot-demo.gif)
 
 *Looking for how to do the **moving price label effect**? [Another repo here.](https://github.com/aunnnn/MovingNumbersView)*
 
 Demo stock API is from [Alphavantage](https://www.alphavantage.co).
 
-## Features
+## Features :sparkles:
 - Support drag interaction, highlight active segment
 - Support glowing indicator, i.e. for real-time data
 - Customize animation duration, glowing size, labels etc.
@@ -140,4 +138,31 @@ public struct RHLinePlotConfig {
 }
 ```
 ## TODO
+- Support two finger drag to compare between two values on the plot.
 - ~Dragging in the interactive plot consumes all the gestures. If you put it in a `ScrollView`, you can't scroll the scroll view in the interactive plot area, you'd be interacting with the plot instead.~ - Fixed by using a clear [proxy view](https://github.com/aunnnn/RHLinePlot/blob/master/RHLinePlot/PressAndHorizontalDragGesture.swift) to handle gestures
+
+## Fun (Solved) Problems
+
+### Drag gesture consumes all the drag
+> Problem: So you can't put the plot in a scroll view and scroll down on the plot. I tried adding `LongPressGesture` like in Apple's tutorial, but looks like it too consumes gesture exclusively if put under a scroll view.
+
+Solution: This is currently fixed by putting a [proxy view]((https://github.com/aunnnn/RHLinePlot/blob/master/RHLinePlot/PressAndHorizontalDragGesture.swift) that implements custom long press gesture detection.
+
+### Indicator label must stick at the edge of plot
+
+> Problem: To stick the indicator label (`valueStickLabel`) translation at the horizontal edge of the plot, we need to know the label width. However its content is dynamic, it could be anything a user set.
+
+Solution: This is fixed by having two `valueStickLabel`s. First one is used for sizing and hidden away. The second one is overlaid on the first with `GeometryReader`, so we know the final size of the label, ready to calculate the translation next (where we could clamp its offset with the width). 
+
+```swift
+// Indicator Label
+//
+// HACK: Get a dynamic size of the indicator label with `overlay` + `GeometryReader`.
+// Hide the bottom one (just use it for sizing), then show the overlaid one.
+valueStickLabel.opacity(0)
+    .overlay(
+        GeometryReader { labelProxy in
+            valueStickLabel
+                .transformEffect(labelTranslation(labelProxy: labelProxy))
+        }.opacity(stickAndLabelOpacity))
+```
