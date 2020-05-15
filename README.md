@@ -166,3 +166,26 @@ valueStickLabel.opacity(0)
                 .transformEffect(labelTranslation(labelProxy: labelProxy))
         }.opacity(stickAndLabelOpacity))
 ```
+
+![StickylabelDemo](https://raw.githubusercontent.com/aunnnn/RHLinePlot/master/rhlineplot-stickylabeldemo.gif)
+
+### Laser mode is unresponsive to segment highlighting
+> Problem: The laser mode puts 3 blur effects on each segment of the line plot, so it can be unresponsive to drag around fast and animate opacity of different parts.
+
+Solution: Just use `drawingGroup()`. This helps a lot. However, this introduces the next issue:
+
+### The blurry effect is clipped off at the edge of the plot frame with `drawingGroup()`
+> Problem: Using `drawingGroup()` seems to apply the `clipsToBounds`-like effect on the blurry part, and it doesn't look nice.
+
+Solution: [Inset the plot canvas](https://github.com/aunnnn/RHLinePlot/blob/master/RHLinePlot/RHLinePlot%2BSegmented.swift) relative to the `plotLineWidth` config (the larger the value, the larger the blurry blob):
+```swift
+let adjustedEachBorderDueToBlur: CGFloat = {
+    if rhLinePlotConfig.useLaserLightLinePlotStyle {
+        return 7.5 * rhLinePlotConfig.plotLineWidth
+    } else {
+        return 0
+    }
+}()
+let largerCanvas = canvasFrame.insetBy(dx: -adjustedEachBorderDueToBlur, dy: -adjustedEachBorderDueToBlur)
+```
+![BlurryFixedDemo](https://raw.githubusercontent.com/aunnnn/RHLinePlot/master/rhlineplot-blurryfixeddemo.gif)
