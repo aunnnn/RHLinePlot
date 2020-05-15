@@ -14,7 +14,7 @@ Demo stock API is from [Alphavantage](https://www.alphavantage.co).
   * [With interactive elements](#with-interactive-elements)
 - [Configuration via Environment](#configuration-via-environment)
 - [TODO](#todo)
-- [Fun Solved Problems](#fun--solved--problems)
+- [Fun Solved Problems](#fun-solved-problems)
   * [Drag gesture consumes all the drag](#drag-gesture-consumes-all-the-drag)
   * [Indicator label must stick at the edge of plot](#indicator-label-must-stick-at-the-edge-of-plot)
   * [Laser mode is unresponsive to segment highlighting](#laser-mode-is-unresponsive-to-segment-highlighting)
