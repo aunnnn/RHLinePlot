@@ -7,6 +7,8 @@ Line plot like in Robinhood app, in SwiftUI
 
 Demo stock API is from [Alphavantage](https://www.alphavantage.co).
 
+P.S. This is not in anyway affiliate with Robinhood officially. This is just an attempt to replicate its great UI!
+
 ## Table of Contents
 - [Installation](#installation)
 - [APIs](#apis)
