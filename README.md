@@ -5,7 +5,7 @@ Line plot like in Robinhood app, in SwiftUI
 
 *Looking for how to do the **moving price label effect**? [Another repo here.](https://github.com/aunnnn/MovingNumbersView)*
 
-*P.S. Of course this is not in anyway affiliate with Robinhood officially. This is just an attempt to replicate its UI.*
+*P.S. Of course this is not in anyway affiliate with Robinhood officially. This is just an attempt to replicate its UI and I don't own any of this design.*
 
 Demo stock API is from [Alphavantage](https://www.alphavantage.co).
 
