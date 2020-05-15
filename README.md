@@ -179,11 +179,11 @@ Solution: Just use `drawingGroup()`. This helps a lot. However, this introduces 
 
 ![BlurryProblemDemo](https://raw.githubusercontent.com/aunnnn/RHLinePlot/master/rhlineplot-blurryproblemdemo.gif)
 
-Solution: [Inset the plot canvas](https://github.com/aunnnn/RHLinePlot/blob/master/RHLinePlot/RHLinePlot%2BSegmented.swift) relative to the `plotLineWidth` config (the larger the value, the larger the blurry blob):
+Solution: [Inset the plot canvas](https://github.com/aunnnn/RHLinePlot/blob/master/RHLinePlot/RHLinePlot%2BSegmented.swift) relative to the `plotLineWidth` config (the larger the value, the larger the blurry blob) so that `drawingGroup` has more space to draw and cache image:
 ```swift
 let adjustedEachBorderDueToBlur: CGFloat = {
     if rhLinePlotConfig.useLaserLightLinePlotStyle {
-        return 7.5 * rhLinePlotConfig.plotLineWidth
+        return 7.5 * rhLinePlotConfig.plotLineWidth // Magic number accounts for blurring
     } else {
         return 0
     }
