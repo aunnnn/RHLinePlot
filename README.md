@@ -161,7 +161,7 @@ public struct RHLinePlotConfig {
 ### Drag gesture consumes all the drag
 > Problem: So you can't put the plot in a scroll view and scroll down on the plot. I tried adding `LongPressGesture` like in Apple's tutorial, but looks like it too consumes gesture exclusively if put under a scroll view.
 
-Solution: This is currently fixed by putting a [proxy view]((https://github.com/aunnnn/RHLinePlot/blob/master/RHLinePlot/PressAndHorizontalDragGesture.swift) that implements custom long press gesture detection.
+Solution: This is currently fixed by putting a [proxy view](https://github.com/aunnnn/RHLinePlot/blob/master/RHLinePlot/PressAndHorizontalDragGesture.swift) that implements custom long press gesture detection.
 
 ### Indicator label must stick at the edge of plot
 
