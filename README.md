@@ -177,6 +177,8 @@ Solution: Just use `drawingGroup()`. This helps a lot. However, this introduces 
 ### The blurry effect is clipped off at the edge of the plot frame with `drawingGroup()`
 > Problem: Using `drawingGroup()` seems to apply the `clipsToBounds`-like effect on the blurry part, and it doesn't look nice.
 
+![BlurryProblemDemo](https://raw.githubusercontent.com/aunnnn/RHLinePlot/master/rhlineplot-blurryproblemdemo.gif)
+
 Solution: [Inset the plot canvas](https://github.com/aunnnn/RHLinePlot/blob/master/RHLinePlot/RHLinePlot%2BSegmented.swift) relative to the `plotLineWidth` config (the larger the value, the larger the blurry blob):
 ```swift
 let adjustedEachBorderDueToBlur: CGFloat = {
