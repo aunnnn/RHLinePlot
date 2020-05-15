@@ -1,9 +1,7 @@
 # RHLinePlot
-Line plot like in Robinhood app, in pure SwiftUI
+Line plot like in Robinhood app, in SwiftUI
 
-Demo (higher-res on [Reddit](https://www.reddit.com/r/SwiftUI/comments/g0hcct/rhlineplot_demo_a_robinhoodlike_line_plot_in/))
-
-![Demo](https://raw.githubusercontent.com/aunnnn/RHLinePlot/master/rhplot-demo-new.gif)
+![Demo](https://raw.githubusercontent.com/aunnnn/RHLinePlot/master/rhlineplot-demo.gif)
 
 *Looking for how to do the **moving price label effect**? [Another repo here.](https://github.com/aunnnn/MovingNumbersView)*
 
