@@ -152,8 +152,6 @@ Solution: This is currently fixed by putting a [proxy view]((https://github.com/
 
 > Problem: To stick the indicator label (`valueStickLabel`) translation at the horizontal edge of the plot, we need to know the label width. However its content is dynamic, it could be anything a user set.
 
-![StickylabelDemo](https://raw.githubusercontent.com/aunnnn/RHLinePlot/master/rhlineplot-stickylabeldemo.gif)
-
 Solution: This is fixed by having two `valueStickLabel`s. First one is used for sizing and hidden away. The second one is overlaid on the first with `GeometryReader`, so we know the final size of the label, ready to calculate the translation next (where we could clamp its offset with the width). 
 
 ```swift
@@ -168,6 +166,9 @@ valueStickLabel.opacity(0)
                 .transformEffect(labelTranslation(labelProxy: labelProxy))
         }.opacity(stickAndLabelOpacity))
 ```
+
+![StickylabelDemo](https://raw.githubusercontent.com/aunnnn/RHLinePlot/master/rhlineplot-stickylabeldemo.gif)
+
 ### Laser mode is unresponsive to segment highlighting
 > Problem: The laser mode puts 3 blur effects on each segment of the line plot, so it can be unresponsive to drag around fast and animate opacity of different parts.
 
