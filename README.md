@@ -7,6 +7,19 @@ Line plot like in Robinhood app, in SwiftUI
 
 Demo stock API is from [Alphavantage](https://www.alphavantage.co).
 
+## Table of Contents
+- [Installation](#installation)
+- [APIs](#apis)
+  * [Without any interaction](#without-any-interaction)
+  * [With interactive elements](#with-interactive-elements)
+- [Configuration via Environment](#configuration-via-environment)
+- [TODO](#todo)
+- [Fun Solved Problems](#fun--solved--problems)
+  * [Drag gesture consumes all the drag](#drag-gesture-consumes-all-the-drag)
+  * [Indicator label must stick at the edge of plot](#indicator-label-must-stick-at-the-edge-of-plot)
+  * [Laser mode is unresponsive to segment highlighting](#laser-mode-is-unresponsive-to-segment-highlighting)
+  * [The blurry effect is clipped off at the edge of the plot frame with `drawingGroup()`](#the-blurry-effect-is-clipped-off-at-the-edge-of-the-plot-frame-with-drawinggroup)
+
 ## Features :sparkles:
 - Support drag interaction, highlight active segment
 - Support glowing indicator, i.e. for real-time data
@@ -141,7 +154,7 @@ public struct RHLinePlotConfig {
 - Support two finger drag to compare between two values on the plot.
 - ~Dragging in the interactive plot consumes all the gestures. If you put it in a `ScrollView`, you can't scroll the scroll view in the interactive plot area, you'd be interacting with the plot instead.~ - Fixed by using a clear [proxy view](https://github.com/aunnnn/RHLinePlot/blob/master/RHLinePlot/PressAndHorizontalDragGesture.swift) to handle gestures
 
-## Fun (Solved) Problems
+## Fun Solved Problems
 
 ### Drag gesture consumes all the drag
 > Problem: So you can't put the plot in a scroll view and scroll down on the plot. I tried adding `LongPressGesture` like in Apple's tutorial, but looks like it too consumes gesture exclusively if put under a scroll view.
